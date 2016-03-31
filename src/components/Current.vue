@@ -5,22 +5,22 @@
             <div class="panel-body">
                 <div class="row">
                     <form>
-                    <div class="col-sm-6 add-task">
-                        <input id="addTaskName" v-model="edited.name" type="text" class="form-control add-task" placeholder="Task name" required="required"/>
-                    </div>
-                    <div class="col-sm-2 add-task">
-                        <input v-model="edited.category" type="text" class="form-control add-task" placeholder="Category" />
-                    </div>
-                    <div class="col-sm-2 add-task">
-                        <input v-model="edited.subcategory" type="text" class="form-control add-task" placeholder="Subcategory" />
-                    </div>
-                    <div class="col-sm-1 add-task">
-                        <input v-model="edited.units" type="number" min="0" class="form-control add-task" placeholder="Units" required/>
-                    </div>
-                    <div class="col-sm-1 add-task">
-                        <input type="submit" @click="addTask($event)" class="btn btn-warning form-control" value="Add"/>
-                    </div>
-                   </form>
+                        <div class="col-sm-6 add-task">
+                            <input id="addTaskName" v-model="edited.name" type="text" class="form-control add-task" placeholder="Task name" required="required"/>
+                        </div>
+                        <div class="col-sm-2 add-task">
+                            <input v-model="edited.category" type="text" class="form-control add-task" placeholder="Category" />
+                        </div>
+                        <div class="col-sm-2 add-task">
+                            <input v-model="edited.subcategory" type="text" class="form-control add-task" placeholder="Subcategory" />
+                        </div>
+                        <div class="col-sm-1 add-task">
+                            <input v-model="edited.units" type="number" min="0" class="form-control add-task" placeholder="Units" required/>
+                        </div>
+                        <div class="col-sm-1 add-task">
+                            <input type="submit" @click="addTask($event)" class="btn btn-warning form-control" value="Add"/>
+                        </div>
+                    </form>
                 </div>
                 <div v-if="tasks.length">
                     <hr>
@@ -61,10 +61,13 @@
         methods: {
             addTask: function(e) {
                 e.preventDefault();
-                var clon = _.clone(this.edited);
-                this.tasks.push(clon);
-                $('input.add-task').val('');
-                $('#addTaskName').focus();
+                if(this.edited.name && this.edited.category && this.edited.units) {
+                    var clon = _.clone(this.edited);
+                    this.tasks.push(clon);
+                    $('input.add-task').val('');
+                    $('#addTaskName').focus();
+                    this.edited.name = this.edited.category = this.edited.units = '';
+                }
             }
         }
     }
