@@ -1,6 +1,7 @@
 
 import helpers from './helpers/helpers.js'
 window.pp = helpers.pp;
+window.el = helpers.el;
 
 import Vue from 'vue';
 import App from './App.vue';

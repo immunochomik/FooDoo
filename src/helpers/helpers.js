@@ -14,5 +14,9 @@ export default {
     }, 2);
     cache = null; // Enable garbage collection
     console.log(x);
+  },
+
+  el : function (id) {
+    return document.getElementById(id);
   }
 }
