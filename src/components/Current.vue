@@ -1,11 +1,10 @@
+<link rel="stylesheet" type="text/css" href="../../node_modules/bootstrap/dist/css/bootstrap.min.css" >
 <template>
-        <!-->
-        <link rel="stylesheet" type="text/css" href="../../node_modules/bootstrap/dist/css/bootstrap.min.css" >
-        -->
-    <div class="container-fluid">
+      <div class="container-fluid">
         <div class="panel panel-default">
             <div class="panel-body">
-
+                <day-picker></day-picker>
+                <hr>
                     <div class="text-right"><form class="form-inline">
                         <div class="form-group">
                             <input style="min-width: 30em;" id="addTaskName" v-model="edited.name" type="text" class="form-control add-task" placeholder="Task name"/>
@@ -56,7 +55,8 @@
     </div>
 </template>
 <script>
-    import store from '../store'
+    import store from '../store';
+    import DayPicker from './DayPicker.vue'
     var _ = require('lodash');
     
     export default {
@@ -68,14 +68,19 @@
                 tasks : []
             }
         },
+        components: {
+            'day-picker' : DayPicker
+        },
         route: {
             data : function(to) {
                 document.title = 'Current is current';
+                this.$children[0].$data.starttime = this.$children[0].$data.starttime || today();
                 this.refresh();
             }
         },
         methods: {
             edit: function(task) {
+                console.log();
                 this.edited = task;
                 el('addTaskName').focus();
             },

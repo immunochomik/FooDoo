@@ -1,8 +1,3 @@
-
-import helpers from './helpers/helpers.js'
-window.pp = helpers.pp;
-window.el = helpers.el;
-
 import Vue from 'vue';
 import App from './App.vue';
 import Router from 'vue-router';
@@ -12,6 +7,10 @@ import Calendar from './components/Calendar.vue'
 require('expose?$!expose?jQuery!jquery');
 require('bootstrap-webpack');
 require('bootstrap/dist/css/bootstrap-theme.min.css');
+
+var _ = require('lodash');
+import helpers from './helpers/helpers.js';
+_.extend(window, helpers);
 
 // install router
 Vue.use(Router)
