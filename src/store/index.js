@@ -8,6 +8,10 @@ let cache = {};
 
 export default {
 
+  put : function(doc) {
+    return db.put(doc);
+  },
+
   add : function(item) {
     item._id = new Date().toISOString();
     db.put(item).then(function (response) {
@@ -25,6 +29,10 @@ export default {
     return db.get(id);
   },
 
+  query: function(index, criteria) {
+    return db.query(index, criteria);
+  },
+
   all : function() {
     return db.allDocs({
       include_docs:true
@@ -33,6 +41,14 @@ export default {
 
   remove : function(item) {
     return db.remove(item);
+  },
+
+  removeById: function(id) {
+    db.get(id).then(doc => {
+        return db.remove(doc);
+    }).catch(err => {
+        console.log('Error', err);
+    });
   },
 
   destroy : function() {
