@@ -14,6 +14,7 @@ export default {
 
   add : function(item) {
     item._id = new Date().toISOString();
+    delete item._rev;
     db.put(item).then(function (response) {
 
     }).catch(function(err) {
