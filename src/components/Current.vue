@@ -6,7 +6,6 @@
                 <div class="col-sm-6"><day-picker></day-picker></div>
                 <div class="col-sm-6 text-right">
                     <button @click="toggleMode" class="btn btn-warning">{{mode}}</button>
-                    <button @click="doStuff" class="btn btn-danger">Doo Stuff</button>
                 </div>
                 <hr>
                 <div class="text-right"><form class="form-inline" autocomplete="on" v-on:submit.prevent >
@@ -15,14 +14,11 @@
                                name="taskName"/>
                     </div>
                     <div class="form-group">
-                        <input id="category" v-model="edited.category" type="text" class="form-control add-task" placeholder="Category" width="100%"
+                        <input id="tags" v-model="edited.tags" type="text" class="form-control add-task" placeholder="Tags" width="100%"
                                name="taskCategory"/>
                     </div>
                     <div class="form-group">
-                        <input id="subcategory" v-model="edited.subcategory" type="text" class="form-control add-task" placeholder="Subcategory" />
-                    </div>
-                    <div class="form-group">
-                        <input id="units" v-model="edited.units" type="number" min="0" class="form-control add-task" placeholder="Units" style="max-width: 5em;"/>
+                        <input id="units" v-model="edited.units[mode]" type="number" min="0" class="form-control add-task" placeholder="Units" style="max-width: 5em;"/>
                     </div>
                     <div class="form-group text-right">
                         <button @click="addTask()" class="btn btn-default"><span class="glyphicon glyphicon-ok"></span></button>
@@ -31,25 +27,22 @@
                 </div>
 
                 <div v-for="(mode, list) in { Plan: plan, Execution: execution }">
-                    <hr>
-                    <h4>{{ mode }}</h4>
                     <div v-if="list.length">
                         <table  class="table table-hover table-striped table-condensed">
                             <thead>
                             <tr>
-                                <th class="col-sm-7">Task name</th>
-                                <th class="col-sm-1">Category</th>
-                                <th class="col-sm-1">Subcat</th>
-                                <th class="col-sm-1">Units</th>
+                                <th class="col-sm-7"><small style="color: orange">{{mode}}</small> Task name</th>
+                                <th class="col-sm-2 ">Tags</th>
+                                <th v-if="mode == 'Plan'" class="col-sm-1"><b style="color: #0000ed">{{sumPlan}}</b></th>
+                                <th v-else class="col-sm-1"><b tyle="color: #0000ed">{{sumExecution}}</b></th>
                                 <th class="col-sm-2"></th>
                             </tr>
                             </thead>
                             <tbody>
                             <tr v-for="task in list">
                                 <td @click="edit(task)">{{task.name}} <small style="color: red">{{task.mode}}</small></td>
-                                <td @click="edit(task, 'category')">{{task.category}}</td>
-                                <td @click="edit(task, 'subcategory')">{{task.subcategory}}</td>
-                                <td @click="edit(task, 'units')">{{task.units}}</td>
+                                <td @click="edit(task, 'tags')">{{task.tags.join(', ')}}</td>
+                                <td @click="edit(task, 'units')">{{task.units[mode]}}</td>
                                 <td class="text-right">
                                     <div class="btn-group">
 
@@ -66,14 +59,6 @@
                             </tr>
 
                             </tbody>
-                            <tfoot class="panel-footer table-bordered">
-                                <tr>
-                                    <td colspan="3"></td>
-                                    <td v-if="mode == 'Plan'">{{sumPlan}}</td>
-                                    <td v-else>{{sumExecution}}</td>
-                                    <td></td>
-                                </tr>
-                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -83,36 +68,25 @@
 </template>
 <script>
     import store from '../store';
-    import DayPicker from './DayPicker.vue'
+    import DayPicker from './DayPicker.vue';
     var _ = require('lodash');
 
-    function addIndexes() {
-        var ddoc = {
-            _id: '_design/index',
-            views: {
-                by_day: {
-                    map: function (doc) { emit(doc.day); }.toString()
-                }
-            }
-        };
-        store.put(ddoc).then(function (res) {
-            console.log(res);
-        }).catch(function (err) {
-            // some error (maybe a 409, because it already exists?)
-            console.log(err);
-        });
-    }
+    var plan = 'plan', executed = 'executed';
 
     export default {
         name: 'Current',
         data: function() {
             return {
-                message :'Current!',
-                edited : {},
-                plan : [],
-                execution : [],
+                message : 'Current!',
+                edited : {
+                    units : {
+                        plan : 0,
+                        execution : 0
+                    }
+                },
+                tasks : [],
                 day: today(),
-                mode: 'Plan',
+                mode: plan,
             }
         },
         components: {
@@ -128,12 +102,12 @@
         computed: {
             sumPlan: function() {
                 return _.reduce(this.plan, function(sum, item) {
-                    return parseInt(item.units) + sum;
+                    return parseInt(item.units[plan]) + sum;
                 }, 0);
             },
             sumExecution: function() {
                 return _.reduce(this.execution, function(sum, item) {
-                    return parseInt(item.units) + sum;
+                    return parseInt(item.units[executed]) + sum;
                 }, 0);
             }
         },
@@ -143,40 +117,26 @@
             }
         },
         methods: {
-            doStuff: function() {
-                //return;
-                console.log('dooo!');
-                store.all().then(res => {
-                    pp(res.rows)
-                    _.each(res.rows, function(item) {
-                    });
-                }).catch(err => {
-                    console.log('Error', err);
-                });
-
-            },
             copyToExecuted: function(task) {
                 var clon = _.clone(task);
-                clon.mode = 'Execution';
+                clon.done = true;
                 store.add(clon);
                 this.refresh();
             },
             moveToPlan : function(task) {
-                task.mode = 'Plan';
+                task.done = false;
                 store.put(task);
                 this.refresh();
             },
             toggleMode: function() {
-                this.mode = this.mode === 'Execution' ? 'Plan' : 'Execution';
+                this.mode = this.mode === 'execution' ? 'plan' : 'execution';
             },
             edit: function(task, inputId) {
-                console.log();
                 this.edited = task;
                 inputId = inputId ? inputId : 'addTaskName';
                 el(inputId).focus();
             },
             remove: function(task) {
-                console.log(task);
                 store.remove(task).then(res => {
                     this.refresh();
                 }).catch(err => {
@@ -192,24 +152,24 @@
                     include_docs : true
                 }).then(res => {
                     _.each(res.rows, function(item) {
-                        if(item.doc.mode === 'Plan') {
-                            self.plan.push(item.doc);
-                        } else if (item.doc.mode === 'Execution') {
-                            self.execution.push(item.doc);
-                        }
+                        this.tasks.push(item.doc);
                     });
                 }).catch(err => {console.log(err)})
             },
             addTask: function(e) {
-                if(this.edited.name && this.edited.category && this.edited.units) {
-                    this.edited.units = parseInt(this.edited.units);
+                pp(this.edited);
+                if(this.edited.name && this.edited.tags && this.edited.units) {
+                    this.edited.tags = this.edited.tags.split(', ');
                     var clon = _.clone(this.edited);
+                    clon.units = {};
+                    clon.units[this.mode] = parseInt(this.edited.units[this.mode]);
                     if(this.edited._id) {
                         store.update(clon);
                     } else {
+                        clon._id = _.snakeCase(this.day + '_' + clon.name);
                         clon.day = this.day;
-                        clon.mode = this.mode;
-                        store.add(clon);
+                        clon.done = this.mode !== plan;
+                        store.put(clon);
                     }
                     this.edited = {};
                     this.refresh();
@@ -232,5 +192,10 @@
     input.add-task {
         padding: 2px;
     }
-
+    red {
+        color: red;
+    }
+    blue {
+      color: blue;
+    }
 </style>

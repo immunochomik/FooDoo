@@ -17,6 +17,7 @@
                     <li id="nav-li-1" class="active nav-li" @click="toggleActive('nav-li-1')"><a href="/#!/current">Current Tasks<span class="sr-only">(current)</span></a></li>
                     <li id="nav-li-2" class="nav-li" @click="toggleActive('nav-li-2')"><a href="/#!/calendar">Calendar</a></li>
                     <li id="nav-li-3" class="nav-li" @click="toggleActive('nav-li-3')"><a href="/#!/analysis">Analysis</a></li>
+                    <li id="nav-li-4" class="nav-li" @click="toggleActive('nav-li-4')"><a href="/#!/data">Data</a></li>
                 </ul>
             </div><!--/.nav-collapse -->
         </div><!--/.container-fluid -->

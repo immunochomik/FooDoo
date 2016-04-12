@@ -4,7 +4,7 @@ var db = new PouchDB('tasks');
 
 var remoteCouch = false;
 
-let cache = {};
+var cache = {};
 
 export default {
 
