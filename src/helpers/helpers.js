@@ -9,23 +9,28 @@ String.prototype.format = String.prototype.f =  function() {
   });
 };
 
+function printIt(x) {
+  var cache = [];
+  x = JSON.stringify(x, function (key, value) {
+    if (typeof value === 'object' && value !== null) {
+      if (cache.indexOf(value) !== -1) {
+        // Circular reference found, discard key
+        return;
+      }
+      // Store value in our collection
+      cache.push(value);
+    }
+    return value;
+  }, 2);
+  cache = null; // Enable garbage collection
+  console.log(x);
+}
 
 export default {
- pp : function(x){
-    var cache = [];
-    x = JSON.stringify(x, function (key, value) {
-      if (typeof value === 'object' && value !== null) {
-        if (cache.indexOf(value) !== -1) {
-          // Circular reference found, discard key
-          return;
-        }
-        // Store value in our collection
-        cache.push(value);
-      }
-      return value;
-    }, 2);
-    cache = null; // Enable garbage collection
-    console.log(x);
+  pp : function(){
+    for(var i in arguments) {
+      printIt(arguments[i]);
+    }
   },
 
   el : function (id) {

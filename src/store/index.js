@@ -1,6 +1,6 @@
 var PouchDB = require('pouchdb');
 var _ = require('lodash');
-var db = new PouchDB('tasks');
+var db = new PouchDB('tasks2');
 
 var remoteCouch = false;
 
