@@ -59,12 +59,12 @@
     components: {
         'date-picker': myDatepicker
     },
-        watch: {
-            starttime: function(newVal) {
-                this.$parent.day = newVal;
-            }
+    watch: {
+        starttime: function(newVal) {
+            this.$parent.day = newVal;
         }
     }
+  }
 </script>
 
 <style>

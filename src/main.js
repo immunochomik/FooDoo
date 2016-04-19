@@ -9,15 +9,16 @@ require('expose?$!expose?jQuery!jquery');
 require('bootstrap-webpack');
 require('bootstrap/dist/css/bootstrap-theme.min.css');
 
+
 var _ = require('lodash');
 import helpers from './helpers/helpers.js';
 _.extend(window, helpers);
 
 // install router
-Vue.use(Router)
+Vue.use(Router);
 
 // routing
-var router = new Router()
+var router = new Router();
 
 
 router.map({
@@ -33,16 +34,16 @@ router.map({
   '/data' : {
     component: Data
   }
-})
+});
 
 router.beforeEach(function () {
   window.scrollTo(0, 0)
-})
+});
 
 router.redirect({
   '*': '/current'
-})
+});
 
-router.start(App, 'app')
+router.start(App, 'app');
 
 

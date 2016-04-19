@@ -2,7 +2,7 @@
 <template>
     <div class="container-fluid">
         <div class="row">
-            <div class="col-sm-1">
+            <div v-if="false" class="col-sm-1">
                 <button @click="destroy" class="btn btn-danger">Destroy</button>
             </div>
             <div class="col-sm-1">
@@ -10,6 +10,9 @@
             </div>
             <div class="col-sm-1">
                 <button @click="refresh" class="btn btn-danger">Refresh</button>
+            </div>
+            <div class="col-sm-1">
+              <button @click="doStuff" class="btn btn-danger">Do stuff</button>
             </div>
         </div>
         <hr>
@@ -23,6 +26,7 @@
 </template>
 <script>
     import store from '../store';
+    import Vue from 'vue';
     var _ = require('lodash');
 
     function addIndexes() {
@@ -56,7 +60,6 @@
         },
         methods : {
             refresh : function() {
-                
                 store.all().then(res => {
                     this.rows = JSON.stringify(res.rows, null, 2);
                 }).catch(err => {
@@ -77,15 +80,7 @@
             },
             doStuff: function() {
                 //return;
-                console.log('dooo!');
-                store.all().then(res => {
-                    pp(res.rows)
-                    _.each(res.rows, function(item) {
-                    });
-                }).catch(err => {
-                    console.log('Error', err);
-                });
-
+              Vue.util.warn('Hello');
             },
         }
 

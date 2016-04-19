@@ -13,10 +13,20 @@
         </div>
         <hr>
         <div class="text-right">
-          <form class="form-inline" autocomplete="on" v-on:submit.prevent >
+          <form class="form-inline" autocomplete="off" v-on:submit.prevent >
             <div class="form-group">
-              <input style="min-width: 30em;" id="name" v-model="edited.name" type="text" class="form-control add-task" placeholder="Task name"
-                     name="taskName"/>
+              <auto
+                  id="nameInput"
+                  :list="suggestedNames"
+                  :text.sync="edited.name"
+                  class="form-control"
+                  placeholder="Auto"
+                  style="min-width: 30em;">
+              </auto>
+              <!--<input style="min-width: 30em;" @keyup="searchName" id="nameInput" v-model="edited.name" type="text"
+                     class="form-control add-task" placeholder="Task name"
+                     name="taskName"/> -->
+
             </div>
             <div class="form-group">
               <input id="tags" v-model="edited.tags" type="text" class="form-control add-task" placeholder="Tags" width="100%"
@@ -95,6 +105,8 @@
 <script>
   import store from '../store';
   import DayPicker from './DayPicker.vue';
+  import Auto from './Autocomplete.vue';
+  import $ from 'jquery';
   var _ = require('lodash');
 
   var plan = 'plan', done = 'done';
@@ -109,6 +121,7 @@
           tags: '',
           eUnits: ''
         },
+        suggestedNames: [],
         error: false,
         tasks : [],
         day: today(),
@@ -116,7 +129,8 @@
       }
     },
     components: {
-      'day-picker' : DayPicker
+      'day-picker' : DayPicker,
+      'auto' : Auto,
     },
     route: {
       data : function(to) {
@@ -145,6 +159,19 @@
     watch : {
       day : function(newVal) {
         this.refresh();
+      },
+      "edited.name" : function(newVal) {
+        var self = this;
+        self.suggestedNames = [];
+        store.search(newVal, ['name']).then(function(res) {
+          if(res.rows.length) {
+            _.each(res.rows, function(item) {
+              self.suggestedNames.push(item.doc.name);
+            });
+          }
+        }).catch(function(err) {
+          console.log(err);
+        });
       }
     },
     methods: {
@@ -189,8 +216,8 @@
           _.each(res.rows, function(item) {
             self.tasks.push(item.doc);
           });
-          pp(self.tasks);
-          console.log(self.sumPlan, self.sumDone);
+          //pp(self.tasks);
+          //console.log(self.sumPlan, self.sumDone);
         }).catch(err => {console.log(err)})
       },
       prepClon : function(item)  {

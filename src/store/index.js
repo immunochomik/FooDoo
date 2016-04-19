@@ -1,4 +1,5 @@
 var PouchDB = require('pouchdb');
+PouchDB.plugin(require('pouchdb-quick-search'));
 var _ = require('lodash');
 var db = new PouchDB('tasks2');
 
@@ -7,6 +8,14 @@ var remoteCouch = false;
 var cache = {};
 
 export default {
+
+  search: function(text, fields) {
+      return db.search({
+        query: text,
+        fields: fields,
+        include_docs: true
+      });
+  },
 
   put : function(doc) {
     return db.put(doc);
