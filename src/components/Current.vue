@@ -16,9 +16,10 @@
           <form class="form-inline" autocomplete="off" v-on:submit.prevent >
             <div class="form-group">
               <auto
-                  id="nameInput"
+                  id="name"
                   :list="suggestedNames"
                   :text.sync="edited.name"
+                  :tags.sync="edited.tags"
                   class="form-control"
                   placeholder="Auto"
                   style="min-width: 30em;">
@@ -162,12 +163,21 @@
       },
       "edited.name" : function(newVal) {
         var self = this;
-        self.suggestedNames = [];
         store.search(newVal, ['name']).then(function(res) {
           if(res.rows.length) {
+            var unique = {};
             _.each(res.rows, function(item) {
-              self.suggestedNames.push(item.doc.name);
+              if(self.edited.name !== item.doc.name) {
+                unique[item.doc.name] = item.doc.tags;
+              }
             });
+            self.suggestedNames = [];
+            for(var name in unique) {
+              self.suggestedNames.push({
+                name : name,
+                tags : unique[name]
+              });
+            }
           }
         }).catch(function(err) {
           console.log(err);
@@ -243,9 +253,10 @@
         }
       },
       createTask : function(clon, item) {
+        console.log('create');
         clon.units = {};
         clon.units[this.mode] = parseInt(item.eUnits);
-        clon._id = clon.name + '_' + today();
+        clon._id = clon.name + '_' + this.day;
         clon.day = this.day;
         clon.done = this.mode !== plan;
         clon.plan = !clon.done;
@@ -266,6 +277,7 @@
         }, 4000);
       },
       updateTask : function(clon, item) {
+        console.log('update');
         clon.units[this.mode] = parseInt(item.eUnits);
         store.update(clon);
       }
