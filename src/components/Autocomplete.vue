@@ -1,10 +1,10 @@
 <template>
   <div>
     <input v-model="text" type="text" :id="id" :name="name" :placeholder="placeholder" :class="class" :style="style"
-        @keyup.down="focus(0)">
+        @keyup.down="focus(0)" @keyup="onChange()">
       <ul v-if="list.length" class="list-unstyled text-left autocomplete" :style="style">
         <li class="autocomplete" v-for="(i, item) in list">
-          <input class="autocomplete" id="suggestion_{{i}}" @keyup.down="focus(i+1)" @keyup.up="focus(i-1)" @keyup.enter="choose(item)" value="{{item.name}}"/></li>
+          <input class="autocomplete" id="suggestion_{{i}}"  @keyup.down="focus(i+1)" @keyup.up="focus(i-1)" @keyup.enter="choose(item)" value="{{item.name}}"/></li>
       </ul>
   </div>
 </template>
@@ -28,6 +28,12 @@
     },
 
     methods: {
+      onChange : function() {
+        console.log('change');
+        if(this.text.length === 0) {
+          this.list = [];
+        }
+      },
       choose: function(item) {
         this.text = item.name;
         this.tags = item.tags.join(', ');
