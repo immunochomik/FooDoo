@@ -17,6 +17,8 @@ _.extend(window, helpers);
 // install router
 Vue.use(Router);
 
+Vue.config.debug = true;
+
 // routing
 var router = new Router();
 

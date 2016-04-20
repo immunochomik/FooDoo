@@ -13,7 +13,7 @@
         </div>
         <hr>
         <div class="text-right">
-          <form class="form-inline" autocomplete="off" v-on:submit.prevent >
+          <form id="editForm" class="form-inline" autocomplete="off" v-on:submit.prevent >
             <div class="form-group">
               <auto
                   id="name"
@@ -21,23 +21,18 @@
                   :text.sync="edited.name"
                   :tags.sync="edited.tags"
                   class="form-control"
-                  placeholder="Auto"
-                  style="min-width: 30em;">
+                  placeholder="Task name"
+                  :style.sync="nameInputStyle">
               </auto>
-              <!--<input style="min-width: 30em;" @keyup="searchName" id="nameInput" v-model="edited.name" type="text"
-                     class="form-control add-task" placeholder="Task name"
-                     name="taskName"/> -->
-
             </div>
             <div class="form-group">
-              <input id="tags" v-model="edited.tags" type="text" class="form-control add-task" placeholder="Tags" width="100%"
-                     name="taskCategory"/>
+              <input id="tags" v-model="edited.tags" type="text" class="form-control add-task" placeholder="Tags" style="width: 160px;"/>
             </div>
             <div class="form-group">
-              <input id="units" v-model="edited.eUnits" type="number" min="0" class="form-control add-task" placeholder="Units" style="max-width: 5em;"/>
+              <input id="units" v-model="edited.eUnits" type="number" min="0" class="form-control add-task" placeholder="Units" style="width: 60px;"/>
             </div>
             <div class="form-group text-right">
-              <button @click="parseTask()" class="btn btn-default"><span class="glyphicon glyphicon-ok"></span></button>
+              <button id="parseButton" @click="parseTask()" class="btn btn-default" style="width: 40px;"><span class="glyphicon glyphicon-ok" ></span></button>
             </div>
           </form>
         </div>
@@ -141,6 +136,10 @@
       }
     },
     computed: {
+      nameInputStyle : function () {
+        var val = window.innerWidth - 240 - 100;
+        return "width: {0}px".f([val]);
+      },
       sumPlan: function() {
         return _.reduce(this.tasks, function(sum, item) {
           var units = item.plan ? parseInt(item.units[plan]) : 0;

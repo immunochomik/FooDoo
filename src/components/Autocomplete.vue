@@ -2,10 +2,10 @@
   <div>
     <input v-model="text" type="text" :id="id" :name="name" :placeholder="placeholder" :class="class" :style="style"
         @keyup.down="focus(0)">
-    <ul v-if="list.length" class="list-unstyled list-group text-left autocomplete">
-      <li :style="style" class="list-group-item" v-for="(i, item) in list">
-        <input class="form-control" id="suggestion_{{i}}" @keyup.down="focus(i+1)" @keyup.up="focus(i-1)" @keyup.enter="choose(item)" value="{{item.name}}"/></li>
-    </ul>
+      <ul v-if="list.length" class="list-unstyled text-left autocomplete" :style="style">
+        <li class="autocomplete" v-for="(i, item) in list">
+          <input class="autocomplete" id="suggestion_{{i}}" @keyup.down="focus(i+1)" @keyup.up="focus(i-1)" @keyup.enter="choose(item)" value="{{item.name}}"/></li>
+      </ul>
   </div>
 </template>
 
@@ -19,14 +19,14 @@
       'class',
       'text',
       'tags',
-      'style'
+      'style',
     ],
 
     data: function () {
       return {
       }
-
     },
+
     methods: {
       choose: function(item) {
         this.text = item.name;
@@ -52,5 +52,19 @@
 <style>
   ul.autocomplete {
     position: absolute;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px 0px;
+    border-top: 1px solid rgb(217, 217, 217);
+    border-right: 1px solid rgb(204, 204, 204);
+    border-bottom: 1px solid rgb(204, 204, 204);
+    border-left: 1px solid rgb(204, 204, 204);
+  }
+  input.autocomplete {
+    border: 0;
+    min-height: 2em;
+    padding: 2px;
+    width: 100%;
+  }
+  input.autocomplete:focus {
+    background-color: silver;
   }
 </style>

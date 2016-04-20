@@ -37,6 +37,10 @@ export default {
     return document.getElementById(id);
   },
 
+  int : function(num) {
+    return parseInt(num);
+  },
+
   today : function() {
     var today = new Date();
     var dd = today.getDate();
