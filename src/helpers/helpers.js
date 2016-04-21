@@ -41,11 +41,11 @@ export default {
     return parseInt(num);
   },
 
-  today : function() {
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth()+1; //January is 0!
-    var yyyy = today.getFullYear();
+  today : function(day) {
+    day = day ? day : new Date();
+    var dd = day.getDate();
+    var mm = day.getMonth()+1; //January is 0!
+    var yyyy = day.getFullYear();
     if(dd < 10) {
       dd = '0' + dd
     }

@@ -1,15 +1,44 @@
+
 <template>
-    <p>{{message}}</p>
+  <div class="container-fluid">
+    <day-picker :day.sync="start"></day-picker>
+    <day-picker :day.sync="end"></day-picker>
+    <hr>
+    <pre>{{ data }}</pre>
+  </div>
+  </div>
 </template>
 <script>
-    export default {
-        name: 'Analysis',
-        data() {
-            return {
-                message :'analysis!'
-            }
-        }
-    }
+  import store from '../store';
+  import DayPicker from './DayPicker.vue';
+  var _ = require('lodash');
+  var d3 = require('d3');
+
+  export default {
+    data: function () {
+      return {
+        start: today(),
+        end: this.day(-7),
+        message: 'Summary!'
+      }
+    },
+    methods :{
+      day : function(count) {
+        var now = new Date()
+        var result = d3.time.day.offset(now, count);
+        console.log(result);
+        return today();
+      }
+    },
+    route: {
+      data: function (to) {
+        document.title = 'Summary';
+      }
+    },
+    components: {
+      'day-picker' : DayPicker,
+    },
+  }
 </script>
 <style>
 

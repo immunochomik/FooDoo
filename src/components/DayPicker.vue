@@ -1,10 +1,16 @@
 <template>
-    <date-picker :time.sync="starttime" :option="option" :limit="limit"></date-picker>
+    <date-picker :time.sync="day" :option="option" :limit="limit"></date-picker>
 </template>
 
 <script>
     import myDatepicker from 'vue-datepicker'
     export default {
+        props : {
+          day : {
+            type: String,
+            default: ''
+          }
+        },
         data: function() {
         return {
             starttime: '',
@@ -58,11 +64,6 @@
     },
     components: {
         'date-picker': myDatepicker
-    },
-    watch: {
-        starttime: function(newVal) {
-            this.$parent.day = newVal;
-        }
     }
   }
 </script>

@@ -29,8 +29,7 @@
 
     methods: {
       onChange : function() {
-        console.log('change');
-        if(this.text.length === 0) {
+        if(!this.text || this.text.length === 0) {
           this.list = [];
         }
       },

@@ -1,4 +1,3 @@
-<link rel="stylesheet" type="text/css" href="../../node_modules/bootstrap/dist/css/bootstrap.min.css" >
 <template>
   <div class="container-fluid">
     <div v-show="error" id="error" class="alert alert-danger form-group" >
@@ -6,7 +5,7 @@
     </div>
     <div class="panel panel-default">
       <div class="panel-body">
-        <div class="col-sm-3"><day-picker></day-picker></div>
+        <div class="col-sm-3"><day-picker :day.sync="day"></day-picker></div>
         <div class="col-sm-8"></div>
         <div class="col-sm-1 text-right">
           <button @click="toggleMode" class="btn btn-warning">{{mode}}</button>
@@ -206,7 +205,11 @@
         this.edited.eUnits = task.units[mode];
         this.edited.tags = task.tags.join(', ');
         this.mode = mode;
-        el(inputId).focus();
+        var input = el(inputId);
+        if(input) {
+          input.focus();
+        }
+
       },
       remove: function(task) {
         store.remove(task).then(res => {
