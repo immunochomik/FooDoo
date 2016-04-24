@@ -7,11 +7,25 @@
        <day-picker :day.sync="end"></day-picker>
       </div>
       <div class="col-sm-6">
-        {{start}} {{end}}
+        <button @click="doneSumary" class="btn btn-danger">Do</button>
       </div>
     </div>
     <hr>
-    <pre>{{ data }}</pre>
+    <p>Tasks Done By Name</p>
+    <table class="table table-hover table-striped table-condensed">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Units</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="row in doneByName">
+          <td>{{row.key}}</td>
+          <td>{{row.value}}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
   </div>
 </template>
@@ -26,10 +40,21 @@
       return {
         start: today(),
         end: this.day(-7),
-        message: 'Summary!'
+        message: 'Summary!',
+        doneByName: [],
       }
     },
     methods :{
+      doneSumary : function() {
+        this.doneByName = [];
+        store.query('index/sum_done_by_name', {
+          group: true,
+        }).then(res => {
+          this.doneByName = res.rows;
+        }).catch(err => {
+            console.log('Error', err);
+        });
+      },
       day : function(count) {
         var now = new Date()
         var result = d3.time.day.offset(now, count);

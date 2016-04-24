@@ -32,7 +32,21 @@ export default {
   },
 
   update : function(item) {
-    return db.put(item);
+    if(!item._rev && item._id) {
+      db.get(item._id).then(res => {
+        console.log('get', res);
+        item._rev = res._rev;
+        db.put(item).then(res => {
+            console.log('Update', res);
+        }).catch(err => {
+            console.log('U Error', err);
+        });
+      }).catch(err => {
+          console.log('Error', err);
+      });
+    } else {
+      return db.put(item)
+    }
   },
 
   get : function(id) {
