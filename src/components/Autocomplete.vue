@@ -44,7 +44,6 @@
           el(this.id).focus();
         } else {
           var li = el('suggestion_' + id);
-          console.log(li);
           if (li) {
             li.focus();
           }

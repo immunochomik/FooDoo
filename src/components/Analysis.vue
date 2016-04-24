@@ -1,8 +1,15 @@
 
 <template>
   <div class="container-fluid">
-    <day-picker :day.sync="start"></day-picker>
-    <day-picker :day.sync="end"></day-picker>
+    <div class="row">
+      <div class="col-sm-6">
+       <day-picker :day.sync="start"></day-picker>
+       <day-picker :day.sync="end"></day-picker>
+      </div>
+      <div class="col-sm-6">
+        {{start}} {{end}}
+      </div>
+    </div>
     <hr>
     <pre>{{ data }}</pre>
   </div>

@@ -43,6 +43,10 @@ export default {
     return db.query(index, criteria);
   },
 
+  allDocs : function(options) {
+    return db.allDocs(options);
+  },
+
   all : function() {
     return db.allDocs({
       include_docs:true

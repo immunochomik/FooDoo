@@ -117,6 +117,7 @@
           eUnits: ''
         },
         suggestedNames: [],
+        unique : {},
         error: false,
         tasks : [],
         day: today(),
@@ -161,28 +162,48 @@
       },
       "edited.name" : function(newVal) {
         var self = this;
-        store.search(newVal, ['name']).then(function(res) {
-          if(res.rows.length) {
-            var unique = {};
-            _.each(res.rows, function(item) {
-              if(self.edited.name !== item.doc.name) {
-                unique[item.doc.name] = item.doc.tags;
-              }
-            });
-            self.suggestedNames = [];
-            for(var name in unique) {
-              self.suggestedNames.push({
-                name : name,
-                tags : unique[name]
-              });
-            }
-          }
-        }).catch(function(err) {
-          console.log(err);
-        });
+        if(!newVal) {
+          return;
+        }
+        if(newVal.substr(-1) === ' ') {
+          self.searchFullWords(newVal);
+        } else {
+          store.allDocs({
+            startkey : newVal,
+            endkey: newVal + '\uffff',
+            include_docs:true
+          }).then(res => {
+            self.parseSearchResponse(res, newVal);
+          }).catch(err => {
+              console.log('Error', err);
+          });
+        }
       }
     },
     methods: {
+      searchFullWords : function(text) {
+        var self = this;
+        store.search(text, ['name']).then(function(res) {
+          self.parseSearchResponse(res, text);
+        }).catch(function(err) {
+          console.log(err);
+        });
+      },
+      parseSearchResponse : function (res, text) {
+        this.suggestedNames = [];
+        var unique = {};
+        if(res.rows.length) {
+          _.each(res.rows, function(item) {
+            if(text !== item.doc.name) {
+              unique[item.doc.name] = item.doc.tags;
+            }
+          });
+          for(var name in unique) {
+            this.suggestedNames.push({name : name, tags : unique[name]});
+          }
+        }
+
+      },
       taskDone: function(task) {
         task.done = true;
         task.units.done = task.units.plan;
@@ -255,7 +276,6 @@
         }
       },
       createTask : function(clon, item) {
-        console.log('create');
         clon.units = {};
         clon.units[this.mode] = parseInt(item.eUnits);
         clon._id = clon.name + '_' + this.day;
@@ -264,7 +284,6 @@
         clon.plan = !clon.done;
         var self = this;
         store.put(clon).then(function(res) {
-          console.log('Added');
         }).catch(function(err) {
           self.showError(err.message);
         });
