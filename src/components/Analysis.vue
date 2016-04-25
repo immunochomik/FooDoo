@@ -1,4 +1,3 @@
-
 <template>
   <div class="container-fluid">
     <div class="row">
@@ -7,7 +6,7 @@
        <day-picker :day.sync="end"></day-picker>
       </div>
       <div class="col-sm-6">
-        <button @click="doneSumary" class="btn btn-danger">Do</button>
+        <button @click="refresh" class="btn btn-danger">Do</button>
       </div>
     </div>
     <hr>
@@ -27,24 +26,37 @@
       </tbody>
     </table>
   </div>
-  </div>
 </template>
 <script>
   import store from '../store';
   import DayPicker from './DayPicker.vue';
   var _ = require('lodash');
   var d3 = require('d3');
-
   export default {
     data: function () {
       return {
-        start: today(),
-        end: this.day(-7),
+        start: dayFrom(-7, new Date()),
+        end: dayFrom(0, new Date()),
         message: 'Summary!',
-        doneByName: [],
+        task: [],
       }
     },
     methods :{
+      refresh: function() {
+        var self = this;
+        this.tasks = [],
+        store.query('index/by_day', {
+          startkey : this.start,
+          endkey: this.end,
+          include_docs : true
+        }).then(res => {
+          console.log(res);
+          _.each(res.rows, function(item) {
+            self.tasks.push(item);
+          });
+          console.log(self.tasks);
+        }).catch(err => {console.log(err)})
+      },
       doneSumary : function() {
         this.doneByName = [];
         store.query('index/sum_done_by_name', {
@@ -55,16 +67,12 @@
             console.log('Error', err);
         });
       },
-      day : function(count) {
-        var now = new Date()
-        var result = d3.time.day.offset(now, count);
-        console.log(result);
-        return today();
-      }
+
     },
     route: {
       data: function (to) {
         document.title = 'Summary';
+        this.refresh();
       }
     },
     components: {

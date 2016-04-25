@@ -1,3 +1,5 @@
+var d3 = require('d3');
+
 String.prototype.format = String.prototype.f =  function() {
   var args;
   args = arguments;
@@ -26,7 +28,34 @@ function printIt(x) {
   console.log(x);
 }
 
+var dFormat = d3.time.format('%Y-%m-%d');
+
+var dayFrom = function(count, date) {
+  date = date ? date : new Date();
+  var result = d3.time.day.offset(date, count);
+  return dFormat(result);
+};
+
 export default {
+  dFormat : dFormat,
+
+  dayFrom : dayFrom,
+
+  daysPeriod : function(from, to, sanity) {
+    sanity = sanity ? sanity : 10;
+    if(from > to) {
+      var temp = to; to = from; from = temp;
+    }
+    var start = new Date(from),
+      period = [dFormat(start)];
+    for(var i = 1; i < sanity; i++) {
+      period.push(dayFrom(i, start));
+      if(period[period.length -1] == to) {
+        return period
+      }
+    }
+  },
+
   pp : function(){
     for(var i in arguments) {
       printIt(arguments[i]);

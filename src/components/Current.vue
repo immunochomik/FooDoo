@@ -202,7 +202,6 @@
             this.suggestedNames.push({name : name, tags : unique[name]});
           }
         }
-
       },
       taskDone: function(task) {
         task.done = true;
