@@ -104,6 +104,7 @@
   import $ from 'jquery';
   var _ = require('lodash');
 
+
   var plan = 'plan', done = 'done';
 
   export default {
@@ -130,6 +131,13 @@
     },
     route: {
       data : function(to) {
+        store.get('_design/index').then(res => {
+            //if there than do nothind
+        }).catch(err => {
+            if(err.status === 404) {
+              store.addIndexes();
+            }
+        });
         document.title = 'Current is current';
         this.$children[0].$data.starttime = this.$children[0].$data.starttime || this.day;
         this.refresh();
