@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid">
+  <div id="mainDiv" class="container-fluid">
     <div v-show="error" id="error" class="alert alert-danger form-group" >
       {{error}}
     </div>
@@ -20,8 +20,7 @@
                   :text.sync="edited.name"
                   :tags.sync="edited.tags"
                   class="form-control"
-                  placeholder="Task name"
-                  :style.sync="nameInputStyle">
+                  placeholder="Task name">
               </auto>
             </div>
             <div class="form-group">
@@ -47,7 +46,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="task in tasks" v-if="task.plan">
+            <tr v-for="task in tasksPlaned">
               <td @click="edit(task, 'plan', 'name')">{{task.name}}</td>
               <td @click="edit(task, 'plan', 'tags')">{{task.tags.join(', ')}}</td>
               <td @click="edit(task, 'plan', 'units')">{{task.units.plan}}</td>
@@ -56,7 +55,6 @@
                   <button class="btn btn-info btn-xs" @click="taskDone(task)">
                     <span class="glyphicon glyphicon-download"></span>
                   </button>
-                  <button class="btn btn-default btn-xs" @click="edit(task, 'plan')"><span class="glyphicon glyphicon-edit"></span></button>
                   <button class="btn btn-danger  btn-xs" @click="remove(task)"><span class="glyphicon glyphicon-remove"></span></button>
                 </div>
               </td>
@@ -75,7 +73,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="task in tasks" v-if="task.done">
+            <tr v-for="task in tasksDone">
               <td @click="edit(task, 'done', 'name')">{{task.name}}</td>
               <td @click="edit(task, 'done', 'tags')">{{task.tags.join(', ')}}</td>
               <td @click="edit(task, 'done', 'units')">{{task.units.done}}</td>
@@ -84,7 +82,6 @@
                   <button v-else class="btn btn-info btn-xs" @click="moveToPlan(task)">
                     <span class="glyphicon glyphicon-upload"></span>
                   </button>
-                  <button class="btn btn-default btn-xs" @click="edit(task, 'done')"><span class="glyphicon glyphicon-edit"></span></button>
                   <button class="btn btn-danger  btn-xs" @click="remove(task)"><span class="glyphicon glyphicon-remove"></span></button>
                 </div>
               </td>
@@ -104,7 +101,14 @@
   import $ from 'jquery';
   var _ = require('lodash');
 
-
+  var resizeTaskName = function() {
+    var field = el('name');
+    if(field) {
+      var length = window.innerWidth < 767 ? window.innerWidth -100 : window.innerWidth - 340;
+      field.style.width = '{0}px'.f([length]);
+    }
+  };
+  window.onresize = resizeTaskName;
   var plan = 'plan', done = 'done';
 
   export default {
@@ -132,21 +136,29 @@
     route: {
       data : function(to) {
         store.get('_design/index').then(res => {
-            //if there than do nothind
+            //if there than do nothind      
         }).catch(err => {
-            if(err.status === 404) {
-              store.addIndexes();
-            }
+            console.log('Error', err);
         });
         document.title = 'Current is current';
         this.$children[0].$data.starttime = this.$children[0].$data.starttime || this.day;
         this.refresh();
       }
     },
+    events : {
+      'hook:created' : function() {
+        console.log('created');
+      },
+      'hook:ready': function() {
+        resizeTaskName();
+      }
+    },
     computed: {
-      nameInputStyle : function () {
-        var val = window.innerWidth - 240 - 100;
-        return "width: {0}px".f([val]);
+      tasksDone : function() {
+        return _.filter(this.tasks, {done: true});
+      },
+      tasksPlaned : function() {
+        return _.filter(this.tasks, {plan:true});
       },
       sumPlan: function() {
         return _.reduce(this.tasks, function(sum, item) {

@@ -1,8 +1,8 @@
 <template>
   <div>
-    <input v-model="text" type="text" :id="id" :name="name" :placeholder="placeholder" :class="class" :style="style"
+    <input v-model="text" type="text" :id="id" :name="name" :placeholder="placeholder" :class="class"
         @keyup.down="focus(0)" @keyup="onChange()">
-      <ul v-if="list.length" class="list-unstyled text-left autocomplete" :style="style">
+      <ul v-if="list.length" class="list-unstyled text-left autocomplete" :style="{ width:inputWidth }">
         <li class="autocomplete" v-for="(i, item) in list">
           <input class="autocomplete" id="suggestion_{{i}}"  @keyup.down="focus(i+1)" @keyup.up="focus(i-1)" @keyup.enter="choose(item)" value="{{item.name}}"/></li>
       </ul>
@@ -19,14 +19,19 @@
       'class',
       'text',
       'tags',
-      'style',
     ],
 
     data: function () {
       return {
       }
     },
-
+    computed : {
+      inputWidth : function() {
+        var width = el(this.id).style.width;
+        console.log('w', width);
+        return width;
+      }
+    },
     methods: {
       onChange : function() {
         if(!this.text || this.text.length === 0) {
