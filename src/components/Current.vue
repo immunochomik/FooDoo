@@ -27,7 +27,7 @@
               <input id="tags" v-model="edited.tags" type="text" class="form-control add-task" placeholder="Tags" style="width: 160px;"/>
             </div>
             <div class="form-group">
-              <input id="units" v-model="edited.eUnits" type="number" min="0" class="form-control add-task" placeholder="Units" style="width: 60px;"/>
+              <input id="units" v-model="edited.eUnits" type="number" min="0" step="any" class="form-control add-task" placeholder="Units" style="width: 60px;"/>
             </div>
             <div class="form-group text-right">
               <button id="parseButton" @click="parseTask()" class="btn btn-default" style="width: 40px;"><span class="glyphicon glyphicon-ok" ></span></button>
@@ -162,7 +162,7 @@
       },
       sumPlan: function() {
         return _.reduce(this.tasks, function(sum, item) {
-          var units = item.plan ? parseInt(item.units[plan]) : 0;
+          var units = item.plan ? parseFloat(item.units[plan]) : 0;
           return  units + sum;
         }, 0);
       },
@@ -170,7 +170,7 @@
         return _.reduce(this.tasks, function(sum, item) {
           var units = 0;
           if(item.done && item.units[done]) {
-            units = parseInt(item.units[done])
+            units = parseFloat(item.units[done])
           }
           return  units + sum;
         }, 0);
@@ -296,7 +296,7 @@
       },
       createTask : function(clon, item) {
         clon.units = {};
-        clon.units[this.mode] = parseInt(item.eUnits);
+        clon.units[this.mode] = parseFloat(item.eUnits);
         clon._id = clon.name + '_' + this.day;
         clon.day = this.day;
         clon.done = this.mode !== plan;
@@ -318,7 +318,7 @@
       },
       updateTask : function(clon, item) {
         console.log('update');
-        clon.units[this.mode] = parseInt(item.eUnits);
+        clon.units[this.mode] = parseFloat(item.eUnits);
         store.update(clon);
       }
     }
