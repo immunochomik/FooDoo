@@ -46,7 +46,20 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="task in tasksPlaned">
+            <tr style="background-color: #FFF1C6;" v-for="task in tasksPlanedNotDone">
+              <td @click="edit(task, 'plan', 'name')">{{task.name}}</td>
+              <td @click="edit(task, 'plan', 'tags')">{{task.tags.join(', ')}}</td>
+              <td @click="edit(task, 'plan', 'units')">{{task.units.plan}}</td>
+              <td class="text-right">
+                <div class="btn-group">
+                  <button class="btn btn-info btn-xs" @click="taskDone(task)">
+                    <span class="glyphicon glyphicon-download"></span>
+                  </button>
+                  <button class="btn btn-danger  btn-xs" @click="remove(task)"><span class="glyphicon glyphicon-remove"></span></button>
+                </div>
+              </td>
+            </tr>
+            <tr v-for="task in tasksPlanedDone">
               <td @click="edit(task, 'plan', 'name')">{{task.name}}</td>
               <td @click="edit(task, 'plan', 'tags')">{{task.tags.join(', ')}}</td>
               <td @click="edit(task, 'plan', 'units')">{{task.units.plan}}</td>
@@ -73,7 +86,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="task in tasksDone">
+            <tr v-for="task in tasksDone" >
               <td @click="edit(task, 'done', 'name')">{{task.name}}</td>
               <td @click="edit(task, 'done', 'tags')">{{task.tags.join(', ')}}</td>
               <td @click="edit(task, 'done', 'units')">{{task.units.done}}</td>
@@ -157,8 +170,11 @@
       tasksDone : function() {
         return _.filter(this.tasks, {done: true});
       },
-      tasksPlaned : function() {
-        return _.filter(this.tasks, {plan:true});
+      tasksPlanedDone : function() {
+        return _.filter(this.tasks, {plan:true, done:true});
+      },
+      tasksPlanedNotDone : function() {
+        return _.filter(this.tasks, {plan:true, done:false});
       },
       sumPlan: function() {
         return _.reduce(this.tasks, function(sum, item) {
