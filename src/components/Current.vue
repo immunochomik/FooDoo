@@ -3,108 +3,107 @@
     <div v-show="error" id="error" class="alert alert-danger form-group" >
       {{error}}
     </div>
-    <div class="panel panel-default">
-      <div class="panel-body">
-        <div class="col-sm-3"><day-picker :day.sync="day"></day-picker></div>
-        <div class="col-sm-8"></div>
-        <div class="col-sm-1 text-right">
+    <div>
+      <div class="current-page-heading row">
+        <div class="col-sm-3 col-xs-6">
+          <day-picker :day.sync="day"></day-picker>
+        </div>
+        <div class="col-sm-9 col-xs-6 text-right">
+          <button v-if="editCancelable" @click="cancelEdit" class="btn btn-warning">Cancel Edit</button>
           <button @click="toggleMode" class="btn btn-warning">{{mode}}</button>
         </div>
-        <hr>
-        <div class="text-right">
-          <form id="editForm" class="form-inline" autocomplete="off" v-on:submit.prevent >
-            <div class="form-group">
-              <auto
-                  id="name"
-                  :list="suggestedNames"
-                  :text.sync="edited.name"
-                  :tags.sync="edited.tags"
-                  class="form-control"
-                  placeholder="Task name">
-              </auto>
-            </div>
-            <div class="form-group">
-              <input id="tags" v-model="edited.tags" type="text" class="form-control add-task" placeholder="Tags" style="width: 160px;"/>
-            </div>
-            <div class="form-group">
-              <input id="units" v-model="edited.eUnits" type="number" min="0" step="any" class="form-control add-task" placeholder="Units" style="width: 60px;"/>
-            </div>
-            <div class="form-group text-right">
-              <button id="parseButton" @click="parseTask()" class="btn btn-default" style="width: 40px;"><span class="glyphicon glyphicon-ok" ></span></button>
-            </div>
-          </form>
-        </div>
-
-        <div v-if="sumPlan > 0">
-          <table  class="table table-hover table-striped table-condensed">
-            <thead>
-            <tr>
-              <th class="col-sm-7"><small style="color: orange">Plan</small> Task name</th>
-              <th class="col-sm-2 ">Tags</th>
-              <th class="col-sm-1">{{sumPlan}}</th>
-              <th class="col-sm-2"></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr style="background-color: #FFF1C6;" v-for="task in tasksPlanedNotDone">
-              <td @click="edit(task, 'plan', 'name')">{{task.name}}</td>
-              <td @click="edit(task, 'plan', 'tags')">{{task.tags.join(', ')}}</td>
-              <td @click="edit(task, 'plan', 'units')">{{task.units.plan}}</td>
-              <td class="text-right">
-                <div class="btn-group">
-                  <button class="btn btn-info btn-xs" @click="taskDone(task)">
-                    <span class="glyphicon glyphicon-download"></span>
-                  </button>
-                  <button class="btn btn-danger  btn-xs" @click="remove(task)"><span class="glyphicon glyphicon-remove"></span></button>
-                </div>
-              </td>
-            </tr>
-            <tr v-for="task in tasksPlanedDone">
-              <td @click="edit(task, 'plan', 'name')">{{task.name}}</td>
-              <td @click="edit(task, 'plan', 'tags')">{{task.tags.join(', ')}}</td>
-              <td @click="edit(task, 'plan', 'units')">{{task.units.plan}}</td>
-              <td class="text-right">
-                <div class="btn-group">
-                  <button class="btn btn-info btn-xs" @click="taskDone(task)">
-                    <span class="glyphicon glyphicon-download"></span>
-                  </button>
-                  <button class="btn btn-danger  btn-xs" @click="remove(task)"><span class="glyphicon glyphicon-remove"></span></button>
-                </div>
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
-        <div v-if="sumDone > 0">
-          <table  class="table table-hover table-striped table-condensed">
-            <thead>
-            <tr>
-              <th class="col-sm-7"><small style="color: orange">Done</small> Task name</th>
-              <th class="col-sm-2 ">Tags</th>
-              <th class="col-sm-1">{{sumDone}}</th>
-              <th class="col-sm-2"></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="task in tasksDone" >
-              <td @click="edit(task, 'done', 'name')">{{task.name}}</td>
-              <td @click="edit(task, 'done', 'tags')">{{task.tags.join(', ')}}</td>
-              <td @click="edit(task, 'done', 'units')">{{task.units.done}}</td>
-              <td class="text-right">
-                <div class="btn-group">
-                  <button v-else class="btn btn-info btn-xs" @click="moveToPlan(task)">
-                    <span class="glyphicon glyphicon-upload"></span>
-                  </button>
-                  <button class="btn btn-danger  btn-xs" @click="remove(task)"><span class="glyphicon glyphicon-remove"></span></button>
-                </div>
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
+      </div>
+      <div class="panel-body row text-right" style="padding-top: 10px;">
+        <form id="editForm" class="form-inline" autocomplete="off" v-on:submit.prevent >
+          <div class="form-group">
+            <auto
+                id="name"
+                :list="suggestedNames"
+                :text.sync="edited.name"
+                :tags.sync="edited.tags"
+                class="form-control"
+                placeholder="Task name">
+            </auto>
+          </div>
+          <div class="form-group">
+            <input id="tags" v-model="edited.tags" type="text" class="form-control add-task" placeholder="Tags" style="width: 160px;"/>
+          </div>
+          <div class="form-group">
+            <input id="units" v-model="edited.eUnits" type="number" min="0" step="any" class="form-control add-task" placeholder="Units" style="width: 60px;"/>
+          </div>
+          <div class="form-group text-right">
+            <button id="parseButton" @click="parseTask()" class="btn btn-default" style="width: 40px;"><span class="glyphicon glyphicon-ok" ></span></button>
+          </div>
+        </form>
+      </div>
+      <div v-if="sumPlan > 0">
+        <table  class="table table-hover table-striped table-condensed">
+          <thead>
+          <tr>
+            <th class="col-sm-7"><small style="color: orange">Plan</small> Task name</th>
+            <th class="col-sm-2 ">Tags</th>
+            <th class="col-sm-1">{{sumPlan}}</th>
+            <th class="col-sm-2"></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr style="background-color: #FFF1C6;" v-for="task in tasksPlanedNotDone">
+            <td @click="edit(task, 'plan', 'name')">{{task.name}}</td>
+            <td @click="edit(task, 'plan', 'tags')">{{task.tags.join(', ')}}</td>
+            <td @click="edit(task, 'plan', 'units')">{{task.units.plan}}</td>
+            <td class="text-right">
+              <div class="btn-group">
+                <button class="btn btn-info btn-xs" @click="taskDone(task)">
+                  <span class="glyphicon glyphicon-download"></span>
+                </button>
+                <button class="btn btn-danger  btn-xs" @click="remove(task)"><span class="glyphicon glyphicon-remove"></span></button>
+              </div>
+            </td>
+          </tr>
+          <tr v-for="task in tasksPlanedDone">
+            <td @click="edit(task, 'plan', 'name')">{{task.name}}</td>
+            <td @click="edit(task, 'plan', 'tags')">{{task.tags.join(', ')}}</td>
+            <td @click="edit(task, 'plan', 'units')">{{task.units.plan}}</td>
+            <td class="text-right">
+              <div class="btn-group">
+                <button class="btn btn-info btn-xs" @click="taskDone(task)">
+                  <span class="glyphicon glyphicon-download"></span>
+                </button>
+                <button class="btn btn-danger  btn-xs" @click="remove(task)"><span class="glyphicon glyphicon-remove"></span></button>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div v-if="sumDone > 0">
+        <table  class="table table-hover table-striped table-condensed">
+          <thead>
+          <tr>
+            <th class="col-sm-7"><small style="color: orange">Done</small> Task name</th>
+            <th class="col-sm-2 ">Tags</th>
+            <th class="col-sm-1">{{sumDone}}</th>
+            <th class="col-sm-2"></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="task in tasksDone" >
+            <td @click="edit(task, 'done', 'name')">{{task.name}}</td>
+            <td @click="edit(task, 'done', 'tags')">{{task.tags.join(', ')}}</td>
+            <td @click="edit(task, 'done', 'units')">{{task.units.done}}</td>
+            <td class="text-right">
+              <div class="btn-group">
+                <button v-else class="btn btn-info btn-xs" @click="moveToPlan(task)">
+                  <span class="glyphicon glyphicon-upload"></span>
+                </button>
+                <button class="btn btn-danger  btn-xs" @click="remove(task)"><span class="glyphicon glyphicon-remove"></span></button>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
       </div>
     </div>
-  </div>
   </div>
 </template>
 <script>
@@ -117,10 +116,14 @@
   var resizeTaskName = function() {
     var field = el('name');
     if(field) {
-      var length = window.innerWidth < 767 ? window.innerWidth -100 : window.innerWidth - 340;
+      var length = window.innerWidth -100;
+      if(window.innerWidth > 767) {
+        length = window.innerWidth - 302;
+      }
       field.style.width = '{0}px'.f([length]);
     }
   };
+
   window.onresize = resizeTaskName;
   var plan = 'plan', done = 'done';
 
@@ -128,12 +131,13 @@
     name: 'Current',
     data: function() {
       return {
-        message : 'Current!',
         edited : {
-          name : '',
-          tags: '',
-          eUnits: ''
-        },
+            name : '',
+            tags: '',
+            eUnits: '',
+            },
+        editCancelable : false,
+        message : 'Current!',
         suggestedNames: [],
         unique : {},
         error: false,
@@ -149,9 +153,9 @@
     route: {
       data : function(to) {
         store.get('_design/index').then(res => {
-            //if there than do nothind      
+          //if there than do nothind
         }).catch(err => {
-            console.log('Error', err);
+          console.log('Error', err);
         });
         document.title = 'Current is current';
         this.$children[0].$data.starttime = this.$children[0].$data.starttime || this.day;
@@ -211,7 +215,7 @@
           }).then(res => {
             self.parseSearchResponse(res, newVal);
           }).catch(err => {
-              console.log('Error', err);
+            console.log('Error', err);
           });
         }
       }
@@ -257,6 +261,7 @@
         this.mode = this.mode === done ? plan : done;
       },
       edit: function(task, mode, inputId) {
+        this.editCancelable = true;
         this.edited = _.clone(task);
         this.edited.eUnits = task.units[mode];
         this.edited.tags = task.tags.join(', ');
@@ -266,6 +271,14 @@
           input.focus();
         }
 
+      },
+      cancelEdit : function() {
+        this.edited = {
+          name: '',
+          tags: '',
+          eUnits: '',
+        };
+        this.editCancelable = false;
       },
       remove: function(task) {
         store.remove(task).then(res => {
@@ -295,6 +308,7 @@
         return clon;
       },
       parseTask: function(e) {
+        this.editCancelable = false;
         var item = this.edited;
         if(item.name && item.tags && item.eUnits) {
           var clon = this.prepClon(item);
@@ -344,17 +358,16 @@
   div.form-group {
     margin-top: 0.5em;
   }
-
   div.add-task {
     padding: 4px;
   }
   input.add-task {
     padding: 2px;
   }
-  red {
-    color: red;
+  div.current-page-heading {
+    padding-top: 1em;
   }
-  blue {
-    color: blue;
+  hr.just-line {
+    margin : 5px 0;
   }
 </style>

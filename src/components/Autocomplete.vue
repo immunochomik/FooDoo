@@ -1,7 +1,7 @@
 <template>
   <div>
     <input v-model="text" type="text" :id="id" :name="name" :placeholder="placeholder" :class="class"
-        @keyup.down="focus(0)" @keyup="onChange()">
+        @keyup.down="focus(0)" @keyup="onChange()"/>
       <ul v-if="list.length" class="list-unstyled text-left autocomplete" :style="{ width:inputWidth }">
         <li class="autocomplete" v-for="(i, item) in list">
           <input class="autocomplete" id="suggestion_{{i}}"  @keyup.down="focus(i+1)" @keyup.up="focus(i-1)" @keyup.enter="choose(item)" value="{{item.name}}"/></li>
