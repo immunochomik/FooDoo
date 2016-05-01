@@ -31,7 +31,7 @@
           <div class="form-group">
             <input id="units" v-model="edited.eUnits" type="number" min="0" step="any" class="form-control add-task" placeholder="Units" style="width: 60px;"/>
           </div>
-          <div class="form-group text-right">
+          <div id="parseButtonDiv" class="form-group text-right">
             <button id="parseButton" @click="parseTask()" class="btn btn-default" style="width: 40px;"><span class="glyphicon glyphicon-ok" ></span></button>
           </div>
         </form>
@@ -105,6 +105,7 @@
       </div>
     </div>
   </div>
+  <div id="cm" style="width:1cm"></div>
 </template>
 <script>
   import store from '../store';
@@ -113,20 +114,34 @@
   import $ from 'jquery';
   var _ = require('lodash');
 
+  var getScreenSize = function() {
+    var widthCM = screen.width / $('#cm').width();
+    alert(widthCM);
+    return widthCM;
+  };
   var resizeTaskName = function() {
-    var field = el('name');
-    if(field) {
-      var length = window.innerWidth -100;
-      if(window.innerWidth > 767) {
-        length = window.innerWidth - 302;
+    var widthCm = getScreenSize();
+    if(document.getElementById('name')) {
+      var width = {
+        name: (window.innerWidth - 302 ) + 'px',
+        tags: '160px',
+        units: '60px',
+        parseButtonDiv: '40px',
+        parseButton: '40px'
+      };
+      if(window.innerWidth < 767) {
+        for(var id in width) {
+          document.getElementById(id).style.width = '100%';
+        }
+      } else {
+        for(var id in width) {
+          document.getElementById(id).style.width = width[id];
+        }
       }
-      field.style.width = '{0}px'.f([length]);
     }
   };
-
   window.onresize = resizeTaskName;
   var plan = 'plan', done = 'done';
-
   export default {
     name: 'Current',
     data: function() {
