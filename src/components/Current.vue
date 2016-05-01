@@ -14,7 +14,7 @@
         </div>
       </div>
       <div class="panel-body row text-right" style="padding-top: 10px;">
-        <form id="editForm" class="form-inline" autocomplete="off" v-on:submit.prevent >
+        <form id="editForm" class="form-inline2" autocomplete="off" v-on:submit.prevent >
           <div class="form-group">
             <auto
                 id="name"
@@ -115,9 +115,7 @@
   var _ = require('lodash');
 
   var getScreenSize = function() {
-    var widthCM = screen.width / $('#cm').width();
-    alert(widthCM);
-    return widthCM;
+    return screen.width / $('#cm').width();
   };
   var resizeTaskName = function() {
     var widthCm = getScreenSize();
@@ -129,9 +127,10 @@
         parseButtonDiv: '40px',
         parseButton: '40px'
       };
-      if(window.innerWidth < 767) {
+      if(window.innerWidth < 528) {
         for(var id in width) {
           document.getElementById(id).style.width = '100%';
+          document.getElementById(id).style.dispaly = 'block';
         }
       } else {
         for(var id in width) {
@@ -147,10 +146,10 @@
     data: function() {
       return {
         edited : {
-            name : '',
-            tags: '',
-            eUnits: '',
-            },
+          name : '',
+          tags: '',
+          eUnits: '',
+        },
         editCancelable : false,
         message : 'Current!',
         suggestedNames: [],
@@ -384,5 +383,22 @@
   }
   hr.just-line {
     margin : 5px 0;
+  }
+  input.task-editor-input {
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  }
+  @media (min-width: 528px) {
+    .form-inline2 .form-group {
+      display: inline-block;
+      margin-bottom: 0;
+      vertical-align: middle;
+    }
+    .form-inline2 .form-control {
+      display: inline-block;
+      width: auto;
+      vertical-align: middle;
+    }
   }
 </style>
