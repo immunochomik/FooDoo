@@ -118,7 +118,6 @@
       </div>
     </div>
   </div>
-  <div id="cm" style="width:1cm"></div>
 </template>
 <script>
   import store from '../store';
@@ -199,7 +198,9 @@
     },
     computed: {
       tasksDoneNotPlanned : function() {
-        return _.filter(this.tasks, {plan:false, done:true});
+        var list = _.filter(this.tasks, {plan:false, done:true});
+        pp(list);
+        return list;
       },
       tasksPlanedDone : function() {
         return _.filter(this.tasks, {plan:true, done:true});
@@ -315,15 +316,21 @@
         });
       },
       refresh: function() {
+        this.cancelEdit();
         var self = this;
         this.tasks = [];
         store.query('index/by_day', {
           key: this.day,
           include_docs : true
         }).then(res => {
+          pp(res);
           _.each(res.rows, function(item) {
-            self.tasks.push(item.doc);
+            if(item.doc) {
+              self.tasks.push(item.doc);
+            }
           });
+          //
+          //
           //pp(self.tasks);
           //console.log(self.sumPlan, self.sumDone);
         }).catch(err => {console.log(err)})
