@@ -132,6 +132,10 @@
   var resizeTaskName = function() {
     var widthCm = getScreenSize();
     if(document.getElementById('name')) {
+      var ulAutocomp = document.getElementById('ulAutocomplete');
+      if(ulAutocomp) {
+        ulAutocomp.style.width =  document.getElementById('name').clientWidth + 'px';
+      }
       var width = {
         name: (window.innerWidth - 302 ) + 'px',
         tags: '160px',
@@ -198,9 +202,7 @@
     },
     computed: {
       tasksDoneNotPlanned : function() {
-        var list = _.filter(this.tasks, {plan:false, done:true});
-        pp(list);
-        return list;
+        return _.filter(this.tasks, {plan:false, done:true});;
       },
       tasksPlanedDone : function() {
         return _.filter(this.tasks, {plan:true, done:true});
@@ -323,14 +325,11 @@
           key: this.day,
           include_docs : true
         }).then(res => {
-          pp(res);
           _.each(res.rows, function(item) {
             if(item.doc) {
               self.tasks.push(item.doc);
             }
           });
-          //
-          //
           //pp(self.tasks);
           //console.log(self.sumPlan, self.sumDone);
         }).catch(err => {console.log(err)})

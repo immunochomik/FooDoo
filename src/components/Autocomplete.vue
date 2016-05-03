@@ -2,7 +2,7 @@
   <div>
     <input v-model="text" type="text" :id="id" :name="name" :placeholder="placeholder" :class="class"
         @keyup.down="focus(0)" @keyup="onChange()"/>
-      <ul v-if="list.length" class="list-unstyled text-left autocomplete" :style="{ width:inputWidth }">
+      <ul id="ulAutocomplete" v-if="list.length" class="list-unstyled text-left autocomplete" >
         <li class="autocomplete" v-for="(i, item) in list">
           <input class="autocomplete" id="suggestion_{{i}}"  @keyup.down="focus(i+1)" @keyup.up="focus(i-1)" @keyup.enter="choose(item)" value="{{item.name}}"/></li>
       </ul>
@@ -30,6 +30,16 @@
         var width = el(this.id).style.width;
         console.log('w', width);
         return width;
+      }
+    },
+    watch : {
+      'list.length' : function(newVal, old) {
+        if(old === 0 && newVal > 0) {
+          var ulAutocomp = document.getElementById('ulAutocomplete');
+          if(ulAutocomp) {
+            ulAutocomp.style.width =  document.getElementById('name').clientWidth + 'px';
+          }
+        }
       }
     },
     methods: {
