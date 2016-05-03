@@ -87,7 +87,20 @@
           </tr>
           </thead>
           <tbody>
-          <tr v-for="task in tasksDone" >
+          <tr v-for="task in tasksPlanedDone" >
+            <td @click="edit(task, 'done', 'name')">{{task.name}}</td>
+            <td @click="edit(task, 'done', 'tags')">{{task.tags.join(', ')}}</td>
+            <td @click="edit(task, 'done', 'units')">{{task.units.done}}</td>
+            <td class="text-right">
+              <div class="btn-group">
+                <button v-else class="btn btn-info btn-xs" @click="moveToPlan(task)">
+                  <span class="glyphicon glyphicon-upload"></span>
+                </button>
+                <button class="btn btn-danger  btn-xs" @click="remove(task)"><span class="glyphicon glyphicon-remove"></span></button>
+              </div>
+            </td>
+          </tr>
+          <tr style="background-color: lightgrey;" v-for="task in tasksDoneNotPlanned" >
             <td @click="edit(task, 'done', 'name')">{{task.name}}</td>
             <td @click="edit(task, 'done', 'tags')">{{task.tags.join(', ')}}</td>
             <td @click="edit(task, 'done', 'units')">{{task.units.done}}</td>
@@ -185,8 +198,8 @@
       }
     },
     computed: {
-      tasksDone : function() {
-        return _.filter(this.tasks, {done: true});
+      tasksDoneNotPlanned : function() {
+        return _.filter(this.tasks, {plan:false, done:true});
       },
       tasksPlanedDone : function() {
         return _.filter(this.tasks, {plan:true, done:true});
