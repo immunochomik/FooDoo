@@ -61,6 +61,12 @@
   import DayPicker from './DayPicker.vue';
   var _ = require('lodash');
   var d3 = require('d3');
+
+  var sortByDone = function(a,b) {
+    if(a.done < b.done) return 1;
+    if(a.done > b.done) return -1;
+    return 0;
+  };
   export default {
     data: function () {
       return {
@@ -99,16 +105,13 @@
           include_docs : true
         }).then(res => {
           _.each(res.rows, function(item) {
+            if(!item.doc) return;
             self.tasks.push(item.doc);
             self.aggregateName(item.doc);
             self.aggregateTags(item.doc);
           });
-          self.byTagList = Object.values(self.byTag).sort(function(a,b) {
-            return a.done < b.done;
-          });
-          self.byNameList = Object.values(self.byName).sort(function(a,b) {
-            return a.done < b.done;
-          });
+          self.byTagList = Object.values(self.byTag).sort(sortByDone);
+          self.byNameList = Object.values(self.byName).sort(sortByDone);
 
         }).catch(err => {console.log(err)});
       },
