@@ -156,7 +156,7 @@
       }
     }
   };
-  window.onresize = resizeTaskName;
+
   var plan = 'plan', done = 'done';
   export default {
     name: 'Current',
@@ -184,6 +184,7 @@
     },
     route: {
       data : function(to) {
+        window.onresize = resizeTaskName;
         store.get('_design/index').then(res => {
           //if there than do nothind
         }).catch(err => {

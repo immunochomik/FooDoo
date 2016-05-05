@@ -4,6 +4,7 @@ import Router from 'vue-router';
 import Current from './components/Current.vue';
 import Analysis from './components/Analysis.vue';
 import Calendar from './components/Calendar.vue';
+import BackBurner from './components/BackBurner.vue';
 import Data from './components/Data.vue';
 require('expose?$!expose?jQuery!jquery');
 require('bootstrap-webpack');
@@ -29,6 +30,9 @@ router.map({
   },
   '/calendar': {
     component: Calendar
+  },
+  '/todo': {
+    component: BackBurner
   },
   '/analysis': {
     component: Analysis
