@@ -38,17 +38,14 @@ var Collection = (function() {
   Collection.prototype.query = function(index, criteria) {
     return this.db.query(index, criteria);
   };
-
   Collection.prototype.allDocs = function(options) {
     return this.db.allDocs(options);
   };
-
   Collection.prototype.all = function() {
     return this.db.allDocs({
       include_docs:true
     });
   };
-
   Collection.prototype.remove = function(item) {
     return this.db.remove(item);
   };
@@ -72,7 +69,6 @@ var Collection = (function() {
   };
   return Collection;
 })();
-
 
 export default {
   Collection : Collection

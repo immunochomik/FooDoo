@@ -186,7 +186,7 @@
       data : function(to) {
         window.onresize = resizeTaskName;
         store.get('_design/index').then(res => {
-          //if there than do nothind
+          //if there than do nothing
         }).catch(err => {
           console.log('Error', err);
         });
@@ -340,12 +340,6 @@
           //console.log(self.sumPlan, self.sumDone);
         }).catch(err => {console.log(err)})
       },
-      prepClon : function(item)  {
-        item.tags = item.tags.split(', ');
-        var clon = _.clone(item);
-        delete clon.eUnits;
-        return clon;
-      },
       parseTask: function(e) {
         this.editCancelable = false;
         var item = this.edited;
@@ -363,6 +357,12 @@
           console.log('we need some data');
         }
       },
+      prepClon : function(item)  {
+        item.tags = item.tags.split(', ');
+        var clon = _.clone(item);
+        delete clon.eUnits;
+        return clon;
+      },
       createTask : function(clon, item) {
         clon.units = {};
         clon.units[this.mode] = parseFloat(item.eUnits);
@@ -376,6 +376,11 @@
           self.showError(err.message);
         });
       },
+      updateTask : function(clon, item) {
+        console.log('update');
+        clon.units[this.mode] = parseFloat(item.eUnits);
+        store.update(clon);
+      },
       showError : function(message) {
         this.error = message;
         console.log(message);
@@ -384,11 +389,6 @@
           console.log('timeout');
           self.error = false;
         }, 4000);
-      },
-      updateTask : function(clon, item) {
-        console.log('update');
-        clon.units[this.mode] = parseFloat(item.eUnits);
-        store.update(clon);
       }
     }
   }
