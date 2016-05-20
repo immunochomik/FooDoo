@@ -40,11 +40,11 @@
         <table class="table table-hover table-striped table-condensed">
             <thead>
                 <tr>
-                    <th class="col-sm-5">Task name</th>
-                    <th class="col-sm-2">Tags</th>
-                    <th class="col-sm-1">Units</th>
-                    <th class="col-sm-1">Prio</th>
-                    <th class="col-sm-2">ETA</th>
+                    <th class="col-sm-5" @click="sortBy('name')">Task name</th>
+                    <th class="col-sm-2" @click="sortBy('tags`')">Tags</th>
+                    <th class="col-sm-1" @click="sortBy('eUnits')">Units</th>
+                    <th class="col-sm-1" @click="sortBy('priority')">Prio</th>
+                    <th class="col-sm-2" @click="sortBy('eta')">ETA</th>
                     <th class="col-sm-1"></th>
                 </tr>
             </thead>
@@ -130,6 +130,7 @@ export default {
         }
     },
     methods: {
+
         plan: function(task) {
             var currentDay = today();
             var futurePlanedDays = {};
@@ -155,7 +156,7 @@ export default {
                         unitsLeft = task.eUnits,
                         counter = 0,
                         maxInDay = 8;
-                    while (unitsLeft > 0) {
+                    while (true) {
                         if (!futurePlanedDaysDone) {
                             for (var day in futurePlanedDays) {
                                 timeInDay = maxInDay - futurePlanedDays[day];
@@ -213,20 +214,15 @@ export default {
                 console.log(res);
             }).catch(err => {console.log(err)})
         },
-        refresh: function() {
+        sortBy(field) {
+            this.refresh(field);
+        },
+        refresh: function(field) {
             this.cancelEdit();
             var self = this;
             this.tasks = [];
-            todo.all().then(res => {
-                _.each(res.rows, function(item) {
-                    if (item.doc) {
-                        self.tasks.push(item.doc);
-                    }
-                });
-                //console.log(self.sumPlan, self.sumDone);
-            }).catch(err => {
-                console.log(err)
-            })
+            field = field || 'priority';
+            todo.allSorted(this.tasks, function(it) {return it[field];})
         },
         edit: function(task, inputId) {
             this.editCancelable = true;

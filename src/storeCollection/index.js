@@ -46,6 +46,23 @@ var Collection = (function() {
       include_docs:true
     });
   };
+  Collection.prototype.allSorted = function(list, callback, criteria) {
+    var tempList = [];
+    criteria = criteria || {include_docs:true};
+    this.db.allDocs(criteria).then(res => {
+          _.each(res.rows, function(item) {
+              if (item.doc) {
+                  tempList.push(item.doc);
+              }
+          });
+          tempList = _.sortBy(tempList, callback);
+          _.each(tempList, function (item) {
+              list.push(item);
+          })
+      }).catch(err => {
+          console.log('Error ' + err);
+      })
+  };
   Collection.prototype.remove = function(item) {
     return this.db.remove(item);
   };
