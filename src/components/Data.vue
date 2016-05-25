@@ -24,10 +24,11 @@
 
 </template>
 <script>
-    import store from '../store';
+    import StoreCollection from '../storeCollection';
     import Vue from 'vue';
     var _ = require('lodash')
-    
+    var store = new StoreCollection.Collection('tasks2');
+
     export default {
         name: 'Data',
         data: function() {
@@ -54,7 +55,7 @@
                   console.log('Destroy');
                   store.destroy();
                   this.refresh();
-              }  
+              }
             },
             createIndexes: function () {
                 store.addIndexes();
