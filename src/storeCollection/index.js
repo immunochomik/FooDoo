@@ -84,6 +84,19 @@ var Collection = (function() {
       });
     }
   };
+  Collection.prototype.ensureIndexes = function(ddoc)
+  {
+      var self = this;
+      this.get('_design/index').then(res => {
+          //if there than do nothing
+      }).catch(err => {
+          if(err.status === 404) {
+              self.init(ddoc);
+          } else {
+              console.log('Error', err);
+          }
+      });
+  }
   return Collection;
 })();
 

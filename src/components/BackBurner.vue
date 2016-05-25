@@ -118,6 +118,7 @@ export default {
         data: function(to) {
             window.onresize = resizeForm;
             document.title = 'To Do';
+            setTimeout(resizeForm, 50);
             this.refresh();
         }
     },
@@ -222,7 +223,7 @@ export default {
             var self = this;
             this.tasks = [];
             field = field || 'priority';
-            todo.allSorted(this.tasks, function(it) {return it[field];})
+            todo.allSorted(this.tasks, function(it) {return it[field];});
         },
         edit: function(task, inputId) {
             this.editCancelable = true;
