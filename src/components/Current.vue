@@ -417,7 +417,7 @@ export default {
             this.editCancelable = false;
         },
         remove: function(task) {
-            store.remove(task).then(res => {
+            store.javaremove(task).then(res => {
                 this.refresh();
             }).catch(err => {
                 console.log('Error', err);

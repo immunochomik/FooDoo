@@ -10,6 +10,8 @@ require('expose?$!expose?jQuery!jquery');
 require('bootstrap-webpack');
 require('bootstrap/dist/css/bootstrap-theme.min.css');
 
+require('fullcalendar/dist/fullcalendar.min.css');
+require('fullcalendar/dist/fullcalendar.min.js');
 
 var _ = require('lodash');
 import helpers from './helpers/helpers.js';
