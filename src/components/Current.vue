@@ -226,7 +226,7 @@ export default {
             unique: {},
             error: false,
             tasks: [],
-            day: today(),
+            day: '',
             mode: plan,
             today: today(),
         }
@@ -238,10 +238,9 @@ export default {
     route: {
         data: function(to) {
             window.onresize = resizeTaskName;
-
+            this.day = getParam('day', today());
             document.title = 'Current is current';
             setTimeout(resizeTaskName, 50);
-            this.refresh();
         }
     },
     events: {
@@ -350,7 +349,6 @@ export default {
         }
     },
     methods: {
-
         goToToday: function() {
             this.day = today();
         },

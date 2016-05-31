@@ -66,6 +66,22 @@ export default {
     return document.getElementById(id);
   },
 
+  getParam: function(key, def) {
+    var resp = def;
+    if(window.location.href) {
+      var href = window.location.href.split('?');
+      if (href.length === 2) {
+        href[1].split('&').forEach(function (pair) {
+          pair = pair.split('=');
+          if (pair[0] === key) {
+            resp = pair[1];
+          }
+        });
+      }
+    }
+    return resp;
+  },
+
   today : function(day) {
     day = day ? day : new Date();
     var dd = day.getDate();

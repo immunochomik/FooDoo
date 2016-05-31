@@ -131,7 +131,6 @@ export default {
         }
     },
     methods: {
-
         plan: function(task) {
             var currentDay = today();
             var futurePlanedDays = {};
