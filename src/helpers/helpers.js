@@ -54,6 +54,14 @@ export default {
         return period
       }
     }
+    return period
+  },
+
+  sortObject: function(obj) {
+    return Object.keys(obj).sort().reduce(function (result, key) {
+      result[key] = obj[key];
+      return result;
+    }, {});
   },
 
   pp : function(){
