@@ -173,15 +173,12 @@
             }
           });
         }).then(res => {
-          console.log(futurePlanedDays);
           futurePlanedDays = self.addEmptyDays(futurePlanedDays);
-          console.log(futurePlanedDays);
           var sanity = 100,
               futurePlanedDaysDone = false,
               timeInDay = 0,
               usedTime = 0,
-              unitsLeft = task.eUnits,
-              counter = 0;
+              unitsLeft = task.eUnits;
           while (true) {
             if (!futurePlanedDaysDone) {
               for (var day in futurePlanedDays) {
@@ -191,7 +188,7 @@
                   self.planForDay(task, day, usedTime);
                   unitsLeft -= usedTime;
                   if(unitsLeft <= 0) {
-                    self.onFinisedPlanning(task, day);
+                    self.onFinishedPlanning(task, day);
                     return;
                   }
                 }
@@ -201,25 +198,25 @@
               }
               futurePlanedDaysDone = true;
             }
-            currentDay = dayFrom(counter++, new Date(currentDay));
             usedTime = Math.min(maxInDay, unitsLeft);
             self.planForDay(task, currentDay, usedTime);
             unitsLeft -= usedTime;
             if(unitsLeft <= 0) {
-              self.onFinisedPlanning(task, currentDay);
+              self.onFinishedPlanning(task, currentDay);
               return;
             }
+            currentDay = dayFrom(1, new Date(currentDay));
             if (sanity-- < 0) {
-              console.log('sanity break');
+              console.error('sanity break');
               break;
             }
           }
         })
         .catch(err => {
-          console.log(err)
+          console.error(err)
         })
       },
-      onFinisedPlanning: function(task, day) {
+      onFinishedPlanning: function(task, day) {
         task.eta = day;
         todo.update(task);
         this.refresh();
@@ -274,7 +271,7 @@
       this.refresh();
       el('name').focus();
     } else {
-      console.log('we need some data');
+      console.error('We need some data');
     }
   },
   prepClon: function(item) {

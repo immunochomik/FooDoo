@@ -55,13 +55,28 @@
               }).then(res => {
                 var tasks = [];
                 var seenIds = {};
+                var currentDay = today();
                 _.each(res.rows, function(item) {
-                  if (!item.doc || seenIds[item.id]) return;
+                  if (!item.doc || seenIds[item.id]) {
+                    return;
+                  }
                   seenIds[item.id] = true;
+                  var color = 'ligthblue';
+                  if(item.doc.day < currentDay) {
+                    // done but not planed
+                    color = '#8E584A';
+                    if(item.doc.plan && item.doc.done) {
+                      color = '#248E47';
+                    }
+                    if(!item.doc.done) {
+                      color = 'grey';
+                    }
+                  }
                   tasks.push({
                     title : item.doc.name,
                     start : item.doc.day,
-                    allDay : true
+                    allDay : true,
+                    color: color,
                   });
                 });
                 callback(tasks);

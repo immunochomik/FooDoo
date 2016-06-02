@@ -55,7 +55,6 @@
         <div class="col-sm-9 col-xs-6 text-right">
           <button v-if="editCancelable" @click="cancelEdit" class="btn btn-warning">Cancel Edit</button>
           <button @click="toggleMode" class="btn btn-warning">{{mode}}</button>
-          <button @click="refresh" class="btn btn-warning">R</button>
           <button v-if="day != today" @click="goToToday" class="btn btn-warning">Today</button>
         </div>
       </div>
