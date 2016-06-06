@@ -1,11 +1,7 @@
 <style>
-
-
-
 </style>
 
 <template>
-
   <div class="container-fluid">
     <div class="row">
       <div class="col-sm-6">
@@ -20,7 +16,7 @@
         <table class="table table-hover table-striped table-condensed">
           <thead>
           <tr>
-            <th @click="taskByNameSort('name')">Name</th>
+            <th @click="taskByNameSort('name')" style="width: 75%">Name</th>
             <th @click="taskByNameSort('plan')" class="text-right">Units
               <br>Planed</th>
             <th @click="taskByNameSort('done')" class="text-right">Units
@@ -29,9 +25,9 @@
           </thead>
           <tbody>
           <tr v-for="row in byNameList">
-            <td>{{row.name}}</td>
-            <td class="text-right">{{row.plan}}</td>
-            <td class="text-right">{{row.done}}</td>
+            <td class="task-name {{makeTagClasses(row.tagClasses)}}">{{row.name}}</td>
+            <td class="task-name text-right {{makeTagClasses(row.tagClasses)}}">{{row.plan}}</td>
+            <td class="task-name text-right {{makeTagClasses(row.tagClasses)}}">{{row.done}}</td>
           </tr>
           <tr>
             <td></td>
@@ -43,19 +39,19 @@
       </div>
       <div class="col-sm-6">
         <p>Categories</p>
-        <table class="table table-hover table-striped table-condensed">
+        <table @mouseleave="tagMouseLeave" class="table table-hover table-striped table-condensed">
           <thead>
           <tr>
-            <th @click="taskByCatSort('name')">Tag</th>
-            <th @click="taskByCatSort('plan')" class="text-right">Units
+            <th @click="taskByCatSort('name')" style="width: 75%">Tag</th>
+            <th @click="taskByCatSort('plan')" class="text-right" >Units
               <br>Planed</th>
-            <th @click="taskByCatSort('done')" class="text-right">Units
+            <th @click="taskByCatSort('done')" class="text-right" >Units
               <br>Done</th>
           </tr>
           </thead>
           <tbody>
-          <tr v-for="row in byTagList">
-            <td>{{row.name}}</td>
+          <tr v-for="row in byTagList" >
+            <td @mouseover=tagRowHover(row.name) >{{row.name}}</td>
             <td class="text-right">{{row.plan}}</td>
             <td class="text-right">{{row.done}}</td>
           </tr>
@@ -64,8 +60,6 @@
       </div>
     </div>
   </div>
-  </div>
-
 </template>
 
 <script>
@@ -117,6 +111,16 @@
       }
     },
     methods: {
+      makeTagClasses : function(obj) {
+        return Object.keys(obj).join(' ');
+      },
+      tagRowHover: function(tag) {
+        $('.task-name').css('background-color', '');
+        $('.tag-'+tag).css('background-color', '#FFCF8B');
+      },
+      tagMouseLeave : function() {
+        $('.task-name').css('background-color', '');
+      },
       taskByNameSort: function(type) {
         if (type == 'name') {
           this.byNameList = this.byNameList.sort(sortByName)
@@ -166,13 +170,22 @@
         });
       },
       aggregateName: function(item) {
+        var tagsClass = function(list) {
+          var tags = {};
+          _.each(_.map(list, function(it) {return 'tag-'+it}), function(it){
+            tags[it] = true;
+          });
+          return tags;
+        };
         if (!this.byName[item.name]) {
           this.byName[item.name] = {
             name: item.name,
             plan: item.units.plan || 0,
-            done: item.units.done || 0
+            done: item.units.done || 0,
+            tagClasses : tagsClass(item.tags),
           }
         } else {
+          this.byName[item.name].tagClasses = _.extend(this.byName[item.name].tagClasses, tagsClass(item.tags));
           this.byName[item.name].plan += item.units.plan || 0;
           this.byName[item.name].done += item.units.done || 0;
         }
