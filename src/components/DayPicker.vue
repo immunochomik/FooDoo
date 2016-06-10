@@ -23,6 +23,7 @@
                 format:'YYYY-MM-DD',
                 placeholder: 'Which day?',
                 inputStyle: {
+                    'max-width': '7em',
                     'display': 'inline-block',
                     'padding': '6px',
                     'line-height': '22px',

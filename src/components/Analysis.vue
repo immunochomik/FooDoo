@@ -43,10 +43,8 @@
           <thead>
           <tr>
             <th @click="taskByCatSort('name')" style="width: 75%">Tag</th>
-            <th @click="taskByCatSort('plan')" class="text-right" >Units
-              <br>Planed</th>
-            <th @click="taskByCatSort('done')" class="text-right" >Units
-              <br>Done</th>
+            <th @click="taskByCatSort('plan')" class="text-right" >Units<br>Planed</th>
+            <th @click="taskByCatSort('done')" class="text-right" >Units<br>Done</th>
           </tr>
           </thead>
           <tbody>

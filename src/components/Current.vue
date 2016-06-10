@@ -49,13 +49,15 @@
     </div>
     <div>
       <div class="current-page-heading row">
-        <div class="col-sm-3 col-xs-6">
+        <div class="col-sm-6 col-xs-6">
           <day-picker :day.sync="day"></day-picker>
+          <button @click="previousDay" class="btn btn-default"><span class="glyphicon glyphicon-menu-left"></span></button>
+          <button @click="nextDay" class="btn btn-default"><span class="glyphicon glyphicon-menu-right"></span></button>
+          <button v-if="day != today" @click="goToToday" class="btn btn-default">Today</button>
         </div>
-        <div class="col-sm-9 col-xs-6 text-right">
-          <button v-if="editCancelable" @click="cancelEdit" class="btn btn-warning">Cancel Edit</button>
-          <button @click="toggleMode" class="btn btn-warning">{{mode}}</button>
-          <button v-if="day != today" @click="goToToday" class="btn btn-warning">Today</button>
+        <div class="col-sm-6 col-xs-6 text-right">
+          <button v-if="editCancelable" @click="cancelEdit" class="btn btn-default">Cancel Edit</button>
+          <button @click="toggleMode" class="btn btn-default">{{mode}}</button>
         </div>
       </div>
       <div class="panel-body row text-right" style="padding-top: 10px;">
@@ -91,12 +93,11 @@
             <td @click="edit(task, 'plan', 'tags')">{{task.tags.join(', ')}}</td>
             <td @click="edit(task, 'plan', 'units')">{{task.units.plan}}</td>
             <td class="text-right">
-              <div class="btn-group">
+                <button class="btn btn-info btn-xs" @click="copyToNextDay(task)"><span class="glyphicon glyphicon-menu-right"></span></button>
                 <button class="btn btn-info btn-xs" @click="taskDone(task)">
-                  <span class="glyphicon glyphicon-download"></span>
+                  <span class="glyphicon glyphicon-menu-down"></span>
                 </button>
                 <button class="btn btn-danger  btn-xs" @click="remove(task)"><span class="glyphicon glyphicon-remove"></span></button>
-              </div>
             </td>
           </tr>
           <tr v-for="task in tasksPlanedDone">
@@ -104,12 +105,11 @@
             <td @click="edit(task, 'plan', 'tags')">{{task.tags.join(', ')}}</td>
             <td @click="edit(task, 'plan', 'units')">{{task.units.plan}}</td>
             <td class="text-right">
-              <div class="btn-group">
-                <button class="btn btn-info btn-xs" @click="taskDone(task)">
-                  <span class="glyphicon glyphicon-download"></span>
+              <button class="btn btn-info btn-xs" @click="copyToNextDay(task)"><span class="glyphicon glyphicon-menu-right"></span></button>
+              <button class="btn btn-info btn-xs" @click="taskDone(task)">
+                  <span class="glyphicon glyphicon-menu-down"></span>
                 </button>
                 <button class="btn btn-danger  btn-xs" @click="remove(task)"><span class="glyphicon glyphicon-remove"></span></button>
-              </div>
             </td>
           </tr>
           </tbody>
@@ -131,9 +131,9 @@
             <td @click="edit(task, 'done', 'tags')">{{task.tags.join(', ')}}</td>
             <td @click="edit(task, 'done', 'units')">{{task.units.done}}</td>
             <td class="text-right">
-              <div class="btn-group">
-                <button v-else class="btn btn-info btn-xs" @click="moveToPlan(task)">
-                  <span class="glyphicon glyphicon-upload"></span>
+              <button class="btn btn-info btn-xs" @click="copyToNextDay(task)"><span class="glyphicon glyphicon-menu-right"></span></button>
+              <button v-else class="btn btn-info btn-xs" @click="moveToPlan(task)">
+                  <span class="glyphicon glyphicon-menu-up"></span>
                 </button>
                 <button class="btn btn-danger  btn-xs" @click="remove(task)"><span class="glyphicon glyphicon-remove"></span></button>
               </div>
@@ -144,12 +144,11 @@
             <td @click="edit(task, 'done', 'tags')">{{task.tags.join(', ')}}</td>
             <td @click="edit(task, 'done', 'units')">{{task.units.done}}</td>
             <td class="text-right">
-              <div class="btn-group">
-                <button v-else class="btn btn-info btn-xs" @click="moveToPlan(task)">
-                  <span class="glyphicon glyphicon-upload"></span>
+              <button class="btn btn-info btn-xs" @click="copyToNextDay(task)"><span class="glyphicon glyphicon-menu-right"></span></button>
+              <button v-else class="btn btn-info btn-xs" @click="moveToPlan(task)">
+                  <span class="glyphicon glyphicon-menu-up"></span>
                 </button>
                 <button class="btn btn-danger  btn-xs" @click="remove(task)"><span class="glyphicon glyphicon-remove"></span></button>
-              </div>
             </td>
           </tr>
           </tbody>
@@ -349,6 +348,27 @@
       }
     },
     methods: {
+      copyToNextDay: function(task) {
+        task = _.clone(task);
+        var day = dayFrom(1, new Date(this.day));
+        task._id = task.name + '_' + day;
+        task.day = day;
+        task.done = false;
+        task.plan = true;
+        task.units.plan = 1;
+        delete task.units.done;
+        delete task._rev;
+        var self = this;
+        store.put(task).then(function(res) {}).catch(function(err) {
+          self.showError(err.message);
+        });
+      },
+      nextDay: function() {
+        this.day = dayFrom(1, new Date(this.day));
+      },
+      previousDay: function() {
+        this.day = dayFrom(-1, new Date(this.day));
+      },
       goToToday: function() {
         this.day = today();
       },
@@ -442,7 +462,7 @@
           console.log(err)
         })
       },
-      parseTask: function(e) {
+      parseTask: function() {
         this.editCancelable = false;
         var item = this.edited;
         if (item.name && item.tags && item.eUnits) {
