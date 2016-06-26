@@ -120,8 +120,9 @@
     },
     route: {
       data: function(to) {
+        toggleTopNavActive('topNavLiBackBurner');
         window.onresize = resizeForm;
-        document.title = 'To Do';
+        document.title = 'Back Burner';
         setTimeout(resizeForm, 50);
         this.refresh();
       }

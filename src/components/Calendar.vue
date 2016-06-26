@@ -20,6 +20,7 @@
     },
     route: {
       data: function(to) {
+        toggleTopNavActive('topNavLiCalendar');
         document.title = 'Calendar';
         var self = this;
         setTimeout(function() { self.calendar() }, 25);

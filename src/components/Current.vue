@@ -236,6 +236,7 @@
     },
     route: {
       data: function(to) {
+        toggleTopNavActive('topNavLiCurrent');
         window.onresize = resizeTaskName;
         this.day = getParam('day', today());
         document.title = 'Current is current';

@@ -3,6 +3,7 @@
 
 <template>
   <div class="container-fluid">
+    <div >
     <div class="row">
       <div class="col-sm-6">
         <day-picker :day.sync="start"></day-picker>
@@ -57,6 +58,15 @@
         </table>
       </div>
     </div>
+    </div>
+    <div v-if="sumUnplanned > 0" id="unplannedTasks">
+     <hr>
+      <h3>Unplanned Work <span>{{unplannedProportion}}%</span></h3>
+      <svg id="svgUnplannedWork" style="width:100%">
+        <rect id="plannedRect" x="0" y="0" width="0" height="30" fill="green" stroke-width="1" stroke="rgb(221,221,221)"/>
+        <rect id="unplannedRect" x="0" y="0" width="0" height="30" fill="#DF7D60" stroke-width="1" stroke="rgb(221,221,221)" />
+      </svg>
+    </div>
   </div>
 </template>
 
@@ -98,6 +108,8 @@
         byDay: {},
         sumPlan: 0,
         sumDone: 0,
+        sumUnplanned: 0,
+        unplannedProportion : 0,
       }
     },
     watch: {
@@ -143,7 +155,7 @@
         this.byTag = {};
         this.byDay = {};
         this.tasks = [];
-        this.sumPlan = this.sumDone = 0;
+        this.sumPlan = this.sumDone = this.sumUnplanned = 0;
       },
       refresh: function() {
         var self = this;
@@ -163,9 +175,26 @@
           });
           self.byTagList = Object.values(self.byTag).sort(sortByDone);
           self.byNameList = Object.values(self.byName).sort(sortByDone);
+          self.prepareUnplannedWork();
         }).catch(err => {
           console.log(err)
         });
+      },
+      prepareUnplannedWork : function() {
+        var proportion = this.sumUnplanned / this.sumDone;
+        this.unplannedProportion = proportion.toFixed(3) * 100;
+        var length = window.innerWidth - 10;
+        var unpLength =  Math.ceil(length * proportion);
+        var planLength = length - unpLength;
+        console.log(length, unpLength, planLength);
+        setTimeout(function() {
+          d3.select('#plannedRect').attr('width', planLength);
+          var unplannedRect = d3.select('#unplannedRect');
+          unplannedRect.attr('width', unpLength)
+              .attr('x', planLength);
+        }, 1000);
+
+
       },
       aggregateName: function(item) {
         var tagsClass = function(list) {
@@ -189,6 +218,10 @@
         }
         this.sumPlan += item.units.plan || 0;
         this.sumDone += item.units.done || 0;
+        if(item.units.done > (item.units.plan || 0)) {
+          this.sumUnplanned += (item.units.done - (item.units.plan || 0));
+          console.log('unplande item add', item.name);
+        }
       },
       aggregateTags: function(item) {
         var self = this;
@@ -219,6 +252,7 @@
     },
     route: {
       data: function(to) {
+        toggleTopNavActive('topNavLiSummary');
         document.title = 'Summary';
         this.refresh();
       }

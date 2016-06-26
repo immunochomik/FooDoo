@@ -41,6 +41,11 @@ export default {
 
   dayFrom : dayFrom,
 
+  toggleTopNavActive : function(id) {
+    $('.nav-li').removeClass('active');
+    $('#' + id).addClass('active');
+  },
+
   daysPeriod : function(from, to, sanity) {
     sanity = sanity ? sanity : 10;
     if(from > to) {
