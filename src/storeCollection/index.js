@@ -1,5 +1,5 @@
 var PouchDB = require('pouchdb');
-PouchDB.plugin(require('pouchdb-quick-search'));
+PouchDB.plugin(require('pouchdb-quick-search/lib'));
 var _ = require('lodash');
 
 var Collection = (function() {

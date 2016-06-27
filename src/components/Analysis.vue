@@ -192,7 +192,7 @@
           var unplannedRect = d3.select('#unplannedRect');
           unplannedRect.attr('width', unpLength)
               .attr('x', planLength);
-        }, 1000);
+        }, 200);
 
 
       },
