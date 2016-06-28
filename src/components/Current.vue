@@ -93,11 +93,11 @@
             <td @click="edit(task, 'plan', 'tags')">{{task.tags.join(', ')}}</td>
             <td @click="edit(task, 'plan', 'units')">{{task.units.plan}}</td>
             <td class="text-right">
-                <button class="btn btn-info btn-xs" @click="copyToNextDay(task)"><span class="glyphicon glyphicon-menu-right"></span></button>
-                <button class="btn btn-info btn-xs" @click="taskDone(task)">
-                  <span class="glyphicon glyphicon-menu-down"></span>
-                </button>
-                <button class="btn btn-danger  btn-xs" @click="remove(task)"><span class="glyphicon glyphicon-remove"></span></button>
+              <button class="btn btn-info btn-xs" @click="copyToNextDay(task)"><span class="glyphicon glyphicon-menu-right"></span></button>
+              <button class="btn btn-info btn-xs" @click="taskDone(task)">
+                <span class="glyphicon glyphicon-menu-down"></span>
+              </button>
+              <button class="btn btn-danger  btn-xs" @click="remove(task)"><span class="glyphicon glyphicon-remove"></span></button>
             </td>
           </tr>
           <tr v-for="task in tasksPlanedDone">
@@ -107,9 +107,9 @@
             <td class="text-right">
               <button class="btn btn-info btn-xs" @click="copyToNextDay(task)"><span class="glyphicon glyphicon-menu-right"></span></button>
               <button class="btn btn-info btn-xs" @click="taskDone(task)">
-                  <span class="glyphicon glyphicon-menu-down"></span>
-                </button>
-                <button class="btn btn-danger  btn-xs" @click="remove(task)"><span class="glyphicon glyphicon-remove"></span></button>
+                <span class="glyphicon glyphicon-menu-down"></span>
+              </button>
+              <button class="btn btn-danger  btn-xs" @click="remove(task)"><span class="glyphicon glyphicon-remove"></span></button>
             </td>
           </tr>
           </tbody>
@@ -133,9 +133,9 @@
             <td class="text-right">
               <button class="btn btn-info btn-xs" @click="copyToNextDay(task)"><span class="glyphicon glyphicon-menu-right"></span></button>
               <button class="btn btn-info btn-xs" @click="moveToPlan(task)">
-                  <span class="glyphicon glyphicon-menu-up"></span>
-                </button>
-                <button class="btn btn-danger  btn-xs" @click="remove(task)"><span class="glyphicon glyphicon-remove"></span></button>
+                <span class="glyphicon glyphicon-menu-up"></span>
+              </button>
+              <button class="btn btn-danger  btn-xs" @click="remove(task)"><span class="glyphicon glyphicon-remove"></span></button>
             </td>
           </tr>
           <tr style="background-color: lightgrey;" v-for="task in tasksDoneNotPlanned">
@@ -144,14 +144,14 @@
             <td @click="edit(task, 'done', 'units')">{{task.units.done}}</td>
             <td class="text-right">
               <button class="btn btn-info btn-xs" @click="copyToNextDay(task)">
-                  <span class="glyphicon glyphicon-menu-right"></span>
+                <span class="glyphicon glyphicon-menu-right"></span>
               </button>
               <button class="btn btn-info btn-xs" @click="moveToPlan(task)">
-                  <span class="glyphicon glyphicon-menu-up"></span>
-               </button>
-                <button class="btn btn-danger btn-xs" @click="remove(task)">
-                    <span class="glyphicon glyphicon-remove"></span>
-                </button>
+                <span class="glyphicon glyphicon-menu-up"></span>
+              </button>
+              <button class="btn btn-danger btn-xs" @click="remove(task)">
+                <span class="glyphicon glyphicon-remove"></span>
+              </button>
             </td>
           </tr>
           </tbody>
@@ -294,7 +294,7 @@
     },
     computed: {
       tasksDoneNotPlanned: function() {
-          console.log('tasksDoneNotPlanned');
+        console.log('tasksDoneNotPlanned');
         return _.filter(this.tasks, {
           plan: false,
           done: true
@@ -313,10 +313,11 @@
         });
       },
       sumPlan: function() {
-        return _.reduce(this.tasks, function(sum, item) {
+        var sum = _.reduce(this.tasks, function(sum, item) {
           var units = item.plan ? parseFloat(item.units[plan]) : 0;
           return units + sum;
         }, 0);
+        return sum.toFixed(1);
       },
       sumDone: function() {
         return _.reduce(this.tasks, function(sum, item) {
@@ -325,7 +326,7 @@
             units = parseFloat(item.units[done])
           }
           return units + sum;
-        }, 0);
+        }, 0).toFixed(1);
       }
     },
     watch: {
@@ -353,8 +354,8 @@
       }
     },
     methods: {
-      copyToNextDay: function(task) {
-        task = _.clone(task);
+      copyToNextDay: function(input) {
+        var task = _.cloneDeep(input);
         var day = dayFrom(1, new Date(this.day));
         task._id = task.name + '_' + day;
         task.day = day;
