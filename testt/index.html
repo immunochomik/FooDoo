@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js"
+          integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+</head>
+<body>
+
+</body>
+<script>
+  (function() {
+    $(document).on('ready', function () {
+      console.log('ready');
+      $.ajax({
+        type: 'GET',
+        url: '/flush.php',
+        xhr: function() {
+          var xhr = new window.XMLHttpRequest();
+          //Upload progress
+          //Download progress
+          xhr.addEventListener("progress", function(evt){
+            console.log(1, evt.target);
+            console.log(1, evt.target.response);
+            if (evt.lengthComputable) {
+              var percentComplete = evt.loaded / evt.total;
+              //Do something with download progress
+              console.log(percentComplete);
+            }
+          }, false);
+          return xhr;
+        },
+        success: function(data){
+          console.log(data);
+        }
+      }).error(function(err) {
+        console.log(err);
+      });
+    });
+  })();
+</script>
+</html>

@@ -487,7 +487,7 @@
       },
       prepClon: function(item) {
         item.tags = item.tags.split(', ');
-        var clon = _.clone(item);
+        var clon = _.cloneDeep(item);
         delete clon.eUnits;
         return clon;
       },

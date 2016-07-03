@@ -1,39 +1,66 @@
+<style>
+  .quoter {
+    display: inline-block;
+    width: 23.5%;
+  }
+
+</style>
 <template>
   <div class="container-fluid">
-    <div class="row">
-      <div v-if="false" class="col-sm-1">
-        <button @click="destroy" class="btn btn-danger">Destroy</button>
+
+    <div class="row" style="padding-left: 1em; padding-right: 1em">
+      <div class="panel-body col-sm-6" >
+        <label>Query</label>
+        <textarea v-model="query" class="form-control" placeholder="were"> </textarea>
+        <div style="margin-top: 1em;" class="text-center">
+          <button class="btn btn-default quoter" @click="find">Find</button>
+          <button class="btn btn-default quoter">Insert</button>
+          <button class="btn btn-default quoter">Update</button>
+          <button class="btn btn-danger quoter">Delete</button>
+        </div>
       </div>
-      <div class="col-sm-1">
-        <button @click="createIndexes" class="btn btn-danger">Indexes</button>
-      </div>
-      <div class="col-sm-1">
-        <button @click="refresh" class="btn btn-danger">Refresh</button>
-      </div>
-      <div class="col-sm-1">
-        <button @click="doStuff" class="btn btn-danger">Do stuff</button>
+      <div class="panel-body col-sm-6">
+        <label>Update</label>
+        <textarea v-model="update" class="form-control" placeholder="update"> </textarea>
       </div>
     </div>
-    <hr>
-    <div class="panel panel-default">
-      <div class="panel-body">
-        <pre>{{ rows }}</pre>
-      </div>
+    <div class="panel-body">
+      <pre class="pre-scrollable" style="min-height: 30em;">{{ fullData }}</pre>
+    </div>
+    <div class="panel-body">
+      <button @click="import" class="btn btn-default">Import</button>
+      <button @click="import" class="btn btn-default">Export</button>
     </div>
   </div>
-
 </template>
 <script>
   import StoreCollection from '../storeCollection';
   import Vue from 'vue';
-  var _ = require('lodash')
+  var _ = require('lodash');
   var store = new StoreCollection.Collection('tasks2');
+
+  function findInDoc(doc, key, expected, compare) {
+    if(key.indexOf('.') == -1) {
+      if(compare) {
+        return compare(doc[key], expected)
+      }
+      return doc[key] == expected
+    }
+    var keyParts = key.split('.'),
+        inDock = doc[keyParts.shift()];
+    if(inDock === undefined) {
+      return false;
+    }
+    return findInDoc(inDock, keyParts.join('.'), expected)
+  }
 
   export default {
     name: 'Data',
     data: function() {
       return {
-        rows : '',
+        fullData : '',
+        update: '{}',
+        query: '{}',
       }
     },
     route: {
@@ -43,9 +70,28 @@
       }
     },
     methods : {
+      find: function() {
+        this.refresh();
+      },
+      filterFind : function(docs) {
+        var query = JSON.parse(this.query);
+        if(query) {
+          docs = docs.filter(function(row) {
+            for(var key in query) {
+              if(!findInDoc(row, key, query[key])) {
+                return false;
+              }
+            }
+            return true;
+          });
+          console.log(query);
+        }
+        return docs;
+      },
       refresh : function() {
+
         store.all().then(res => {
-          this.rows = JSON.stringify(res.rows, null, 2);
+          this.fullData = JSON.stringify(this.filterFind(res.rows), null, 2);
         }).catch(err => {
           console.log('Error', err);
         });
@@ -70,6 +116,4 @@
 
   }
 </script>
-<style>
 
-</style>
