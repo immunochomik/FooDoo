@@ -44,6 +44,7 @@
 <template>
 
   <div id="mainDiv" class="container-fluid">
+    <edit-tags :show.sync="showEditTags"></edit-tags>
     <div v-show="error" id="error" class="alert alert-danger form-group">
       {{error}}
     </div>
@@ -58,6 +59,7 @@
         <div class="col-sm-6 col-xs-6 text-right">
           <button v-if="editCancelable" @click="cancelEdit" class="btn btn-default">Cancel Edit</button>
           <button @click="toggleMode" class="btn btn-default">{{mode}}</button>
+          <button @click="showEditTags = true" class="btn btn-default">Tags</button>
         </div>
       </div>
       <div class="panel-body row text-right" style="padding-top: 10px;">
@@ -167,6 +169,7 @@
   import StoreCollection from '../storeCollection';
   import DayPicker from './DayPicker.vue';
   import Auto from './Autocomplete.vue';
+  import EditTags from './EditTags.vue';
   import $ from 'jquery';
   var _ = require('lodash');
   var store = new StoreCollection.Collection('tasks2');
@@ -222,6 +225,7 @@
           tags: '',
           eUnits: '',
         },
+        showEditTags: false,
         editCancelable: false,
         message: 'Current!',
         suggestedNames: [],
@@ -236,6 +240,7 @@
     components: {
       'day-picker': DayPicker,
       'auto': Auto,
+      'edit-tags': EditTags,
     },
     route: {
       data: function(to) {

@@ -137,8 +137,9 @@
     },
     methods: {
       addEmptyDays: function(futurePlanedDays) {
+        console.log(futurePlanedDays);
         // we need to plan in empty days that lay between planed days
-        var pairs = _.pairs(futurePlanedDays);
+        var pairs = _.toPairs(futurePlanedDays);
         $.each(pairs, function(i, pair) {
           if(pairs[i+1]) {
             var date1 = new Date(pair[0]);
