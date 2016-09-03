@@ -419,7 +419,7 @@
         task.plan = true;
         task.units.plan = task.units.done;
         delete task.units.done;
-        store.update(task);
+        store.a(task);
         this.refresh();
       },
       toggleMode: function() {

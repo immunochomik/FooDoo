@@ -3,23 +3,46 @@
     <div class="modal-wrapper">
       <div class="modal-container">
         <div class="modal-header">
-          <slot name="header">
-            default header
-          </slot>
+          <h3>Tags Editor</h3>
         </div>
-        <div class="modal-body">
-          <slot name="body">
-            default body
-          </slot>
+        <div class="modal-body" style="padding: 5px;">
+          <div>
+            <h4>Tags Types</h4>
+            <div v-show="error" id="error" class="alert alert-danger form-group">
+              {{error}}
+            </div>
+            <table class="table table-hover table-striped table-condensed">
+              <thead>
+                <tr>
+                <th>Tag Type Name</th>
+                <th class="text-center">Sing</th>
+                <th></th>
+              </tr>
+              </thead>
+              <tbody>
+                <tr v-for="type in types">
+                  <td>{{type.name}}</td>
+                  <td class="text-center">{{type.sign}}</td>
+                  <td class="text-right"><button @click="remove(type.name)" class="btn btn-danger btn-xs">
+                    <span class="glyphicon glyphicon-remove"></span></button></td>
+                </tr>
+                <tr>
+                  <td style="width: 70%">
+                    <input class="form-control" type="text" v-model="newName"/>
+                  </td>
+                  <td>
+                    <input class="form-control" type="text" v-model="newSign"/>
+                  </td>
+                  <td class="text-right"><button @click="addTagType()" class="btn btn-info btn-xs">
+                    <span class="glyphicon glyphicon-plus"></span></button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
         <div class="modal-footer">
-          <slot name="footer">
-            default footer
-            <button class="modal-default-button"
-                    @click="show = false">
-              OK
-            </button>
-          </slot>
+            <button class="btn btn-default modal-default-button"
+                    @click="show = false">OK</button>
         </div>
       </div>
     </div>
@@ -27,6 +50,10 @@
 </template>
 
 <script>
+  import StoreCollection from '../storeCollection';
+  var _ = require('lodash');
+
+  const documentId = 'tagsDataDocumentThisIsSoUnique';
   export default {
     name: 'EditTags',
     props: {
@@ -38,9 +65,79 @@
     },
     data: function () {
       return {
+        newSign : '',
+        newName : '',
+        edited : false,
+        types: [],
+        store: null,
+        error: '',
       }
     },
-    methods: {}
+    methods: {
+      remove:function(name) {
+        console.log(name);
+        this.types = this.types.filter(function(row) {
+          return row.name != name;
+        });
+        this.edited = true;
+      },
+      addTagType: function() {
+        if(this.newSign && this.newName) {
+          var self = this;
+          var error = false;
+          _.each(this.types, function(item) {
+            if(self.newSign === item.sign || self.newName == item.name ) {
+              self.error = 'Names and signs has to be unique!';
+              error = true;
+            }
+          });
+          if(error) {
+            return;
+          } else {
+            self.error = '';
+          }
+          this.types.push({name: this.newName, sign: this.newSign});
+          this.edited = true;
+          this.newSign = this.newName = '';
+        }
+      },
+      reload: function() {
+        // get types document form storage
+        var self = this;
+        this.makeStore();
+        this.store.get(documentId).then(res => {
+            self.types = res.types;
+        }).catch(err => {
+            console.log('Error', err);
+        });
+      },
+      save: function() {
+        if(!this.edited) {
+          return;
+        }
+        this.makeStore();
+        var doc = {
+          _id : documentId,
+          types: _.clone(this.types),
+        };
+        this.store.update(doc);
+        this.edited = false;
+      },
+      makeStore: function() {
+        if(!this.store) {
+           this.store = new StoreCollection.Collection('tasks2');
+        }
+      }
+    },
+    watch: {
+      show: function(show) {
+        if(show === true) {
+          this.reload();
+        } else {
+          this.save();
+        }
+      }
+    }
   }
 </script>
 
@@ -63,7 +160,7 @@
   }
 
   .modal-container {
-    width: 300px;
+    width: 50%;
     margin: 0 auto;
     padding: 20px 30px;
     background-color: #fff;
@@ -79,7 +176,7 @@
   }
 
   .modal-body {
-    margin: 20px 0;
+    margin: 2px 0;
   }
 
   .modal-default-button {
