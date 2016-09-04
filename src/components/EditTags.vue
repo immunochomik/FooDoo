@@ -53,7 +53,6 @@
   import StoreCollection from '../storeCollection';
   var _ = require('lodash');
 
-  const documentId = 'tagsDataDocumentThisIsSoUnique';
   export default {
     name: 'EditTags',
     props: {
@@ -65,6 +64,7 @@
     },
     data: function () {
       return {
+        documentId : 'tagsDataDocumentThisIsSoUnique',
         newSign : '',
         newName : '',
         edited : false,
@@ -105,7 +105,7 @@
         // get types document form storage
         var self = this;
         this.makeStore();
-        this.store.get(documentId).then(res => {
+        this.store.get(this.documentId).then(res => {
             self.types = res.types;
         }).catch(err => {
             console.log('Error', err);

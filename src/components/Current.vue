@@ -69,13 +69,14 @@
             </auto>
           </div>
           <div class="form-group">
-            <input id="tags" v-model="edited.tags" type="text" class="form-control add-task" placeholder="Tags" style="width: 160px;" />
-          </div>
-          <div class="form-group">
             <input id="units" v-model="edited.eUnits" type="number" min="0" step="any" class="form-control add-task" placeholder="Units" style="width: 60px;" />
           </div>
           <div id="parseButtonDiv" class="form-group text-right">
             <button id="parseButton" @click="parseTask()" class="btn btn-default" style="width: 40px;"><span class="glyphicon glyphicon-ok"></span></button>
+          </div>
+          <div class="form-group col-sm-12 col-md-12 col-xs-12" style="padding: 0;">
+            <textarea  class="form-control" v-model="edited.text"
+                       style="width: 100%" placeholder="More"></textarea>
           </div>
         </form>
       </div>
@@ -185,7 +186,7 @@
         ulAutocomp.style.width = document.getElementById('name').clientWidth + 'px';
       }
       var width = {
-        name: (window.innerWidth - 302) + 'px',
+        name: (window.innerWidth - 142) + 'px',
         tags: '160px',
         units: '60px',
         parseButtonDiv: '40px',
@@ -222,7 +223,7 @@
       return {
         edited: {
           name: '',
-          tags: '',
+          text: '',
           eUnits: '',
         },
         showEditTags: false,
@@ -235,6 +236,7 @@
         day: '',
         mode: plan,
         today: today(),
+        tagsTypes: null,
       }
     },
     components: {
@@ -293,13 +295,11 @@
         console.log('created');
       },
       'hook:ready': function() {
-        console.log('redy');
         resizeTaskName();
       }
     },
     computed: {
       tasksDoneNotPlanned: function() {
-        console.log('tasksDoneNotPlanned');
         return _.filter(this.tasks, {
           plan: false,
           done: true
@@ -397,13 +397,13 @@
         if (res.rows.length) {
           _.each(res.rows, function(item) {
             if (text !== item.doc.name) {
-              unique[item.doc.name] = item.doc.tags;
+              unique[item.doc.name] = true;
             }
           });
           for (var name in unique) {
             this.suggestedNames.push({
               name: name,
-              tags: unique[name]
+              //tags: unique[name]
             });
           }
         }
@@ -419,28 +419,36 @@
         task.plan = true;
         task.units.plan = task.units.done;
         delete task.units.done;
-        store.a(task);
+        store.update(task);
         this.refresh();
       },
       toggleMode: function() {
         this.mode = this.mode === done ? plan : done;
       },
+      parseTags: function(task) {
+        if(!this.tagsTypes) {
+          this.getTagsTypes();
+        }
+        return {};
+      },
+      getTagsTypes: function() {
+        console.log(documentId);
+      },
       edit: function(task, mode, inputId) {
         this.editCancelable = true;
         this.edited = _.clone(task);
         this.edited.eUnits = task.units[mode];
-        this.edited.tags = task.tags.join(', ');
+        this.edited.text = task.text;
         this.mode = mode;
         var input = el(inputId);
         if (input) {
           input.focus();
         }
-
       },
       cancelEdit: function() {
         this.edited = {
           name: '',
-          tags: '',
+          text: '',
           eUnits: '',
         };
         this.editCancelable = false;
@@ -476,7 +484,7 @@
       parseTask: function() {
         this.editCancelable = false;
         var item = this.edited;
-        if (item.name && item.tags && item.eUnits) {
+        if (item.name && item.eUnits) {
           var clon = this.prepClon(item);
           if (item._id) {
             this.updateTask(clon, item)
@@ -491,7 +499,7 @@
         }
       },
       prepClon: function(item) {
-        item.tags = item.tags.split(', ');
+        item.tags = this.parseTags(item);
         var clon = _.cloneDeep(item);
         delete clon.eUnits;
         return clon;
