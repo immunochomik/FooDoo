@@ -52,9 +52,10 @@
 <script>
   import StoreCollection from '../storeCollection';
   var _ = require('lodash');
-
+  var documentId = 'tagsDataDocumentThisIsSoUnique';
   export default {
     name: 'EditTags',
+    documentId: documentId,
     props: {
       show: {
         type: Boolean,
@@ -64,7 +65,7 @@
     },
     data: function () {
       return {
-        documentId : 'tagsDataDocumentThisIsSoUnique',
+        documentId : documentId,
         newSign : '',
         newName : '',
         edited : false,

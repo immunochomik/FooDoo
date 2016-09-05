@@ -65,18 +65,18 @@
       <div class="panel-body row text-right" style="padding-top: 10px;">
         <form id="editForm" class="form-inline2" autocomplete="off" v-on:submit.prevent>
           <div class="form-group">
-            <auto id="name" :list="suggestedNames" :text.sync="edited.name" :tags.sync="edited.tags" class="form-control" placeholder="Task name">
+            <auto id="name" :list="suggestedNames" :name.sync="edited.name" :text.sync="edited.text" class="form-control" placeholder="Task name">
             </auto>
           </div>
           <div class="form-group">
             <input id="units" v-model="edited.eUnits" type="number" min="0" step="any" class="form-control add-task" placeholder="Units" style="width: 60px;" />
           </div>
           <div id="parseButtonDiv" class="form-group text-right">
-            <button id="parseButton" @click="parseTask()" class="btn btn-default" style="width: 40px;"><span class="glyphicon glyphicon-ok"></span></button>
+            <button type="button" id="parseButton" @click="parseTask()" class="btn btn-default" style="width: 40px;"><span class="glyphicon glyphicon-ok"></span></button>
           </div>
           <div class="form-group col-sm-12 col-md-12 col-xs-12" style="padding: 0;">
-            <textarea  class="form-control" v-model="edited.text"
-                       style="width: 100%" placeholder="More"></textarea>
+            <textarea class="form-control" v-model="edited.text"
+                       style="width: 100%; z-index: -1" placeholder="More"></textarea>
           </div>
         </form>
       </div>
@@ -85,7 +85,6 @@
           <thead>
           <tr>
             <th class="col-sm-7"><small style="color: orange">Plan</small> Task name</th>
-            <th class="col-sm-2 ">Tags</th>
             <th class="col-sm-1">{{sumPlan}}</th>
             <th class="col-sm-2"></th>
           </tr>
@@ -93,7 +92,6 @@
           <tbody>
           <tr style="background-color: #FFF1C6;" v-for="task in tasksPlanedNotDone">
             <td @click="edit(task, 'plan', 'name')">{{task.name}}</td>
-            <td @click="edit(task, 'plan', 'tags')">{{task.tags.join(', ')}}</td>
             <td @click="edit(task, 'plan', 'units')">{{task.units.plan}}</td>
             <td class="text-right">
               <button class="btn btn-info btn-xs" @click="copyToNextDay(task)"><span class="glyphicon glyphicon-menu-right"></span></button>
@@ -105,7 +103,6 @@
           </tr>
           <tr v-for="task in tasksPlanedDone">
             <td @click="edit(task, 'plan', 'name')">{{task.name}}</td>
-            <td @click="edit(task, 'plan', 'tags')">{{task.tags.join(', ')}}</td>
             <td @click="edit(task, 'plan', 'units')">{{task.units.plan}}</td>
             <td class="text-right">
               <button class="btn btn-info btn-xs" @click="copyToNextDay(task)"><span class="glyphicon glyphicon-menu-right"></span></button>
@@ -123,7 +120,6 @@
           <thead>
           <tr>
             <th class="col-sm-7"><small style="color: orange">Done</small> Task name</th>
-            <th class="col-sm-2 ">Tags</th>
             <th class="col-sm-1">{{sumDone}}</th>
             <th class="col-sm-2"></th>
           </tr>
@@ -131,7 +127,6 @@
           <tbody>
           <tr v-for="task in tasksPlanedDone">
             <td @click="edit(task, 'done', 'name')">{{task.name}}</td>
-            <td @click="edit(task, 'done', 'tags')">{{task.tags.join(', ')}}</td>
             <td @click="edit(task, 'done', 'units')">{{task.units.done}}</td>
             <td class="text-right">
               <button class="btn btn-info btn-xs" @click="copyToNextDay(task)"><span class="glyphicon glyphicon-menu-right"></span></button>
@@ -143,7 +138,6 @@
           </tr>
           <tr style="background-color: lightgrey;" v-for="task in tasksDoneNotPlanned">
             <td @click="edit(task, 'done', 'name')">{{task.name}}</td>
-            <td @click="edit(task, 'done', 'tags')">{{task.tags.join(', ')}}</td>
             <td @click="edit(task, 'done', 'units')">{{task.units.done}}</td>
             <td class="text-right">
               <button class="btn btn-info btn-xs" @click="copyToNextDay(task)">
@@ -161,6 +155,10 @@
         </table>
       </div>
     </div>
+    <button @click="showDebug = !showDebug">DEBUG</button>
+    <div v-show="showDebug">
+      <pre class="pre-scrollable">{{debug}}</pre>
+    </div>
   </div>
 
 </template>
@@ -174,6 +172,7 @@
   import $ from 'jquery';
   var _ = require('lodash');
   var store = new StoreCollection.Collection('tasks2');
+  
 
   var getScreenSize = function() {
     return screen.width / $('#cm').width();
@@ -186,13 +185,11 @@
         ulAutocomp.style.width = document.getElementById('name').clientWidth + 'px';
       }
       var width = {
-        name: (window.innerWidth - 142) + 'px',
-        tags: '160px',
+        name: (window.innerWidth - 160) + 'px',
         units: '60px',
         parseButtonDiv: '40px',
         parseButton: '40px'
       };
-      console.log('resizing');
       if (window.innerWidth < 528) {
         for (var id in width) {
           try {
@@ -237,6 +234,8 @@
         mode: plan,
         today: today(),
         tagsTypes: null,
+        showDebug: true,
+        debug: '{}',
       }
     },
     components: {
@@ -251,6 +250,7 @@
         this.day = getParam('day', today());
         document.title = 'Current is current';
         setTimeout(resizeTaskName, 50);
+        this.getTagsTypes();
       }
     },
     events: {
@@ -275,12 +275,11 @@
               }.toString(),
               reduce: function(keys, values, rereduce) {
                 if (rereduce) {
-                  console.log('reredue', values);
+                  console.log('rereduce', values);
                 } else {
                   var vals = values.filter(function(x) {
                     return x ? true : false;
                   });
-                  console.log(vals);
                   return sum(vals);
                 }
               }.toString(),
@@ -292,7 +291,6 @@
             }
           }
         });
-        console.log('created');
       },
       'hook:ready': function() {
         resizeTaskName();
@@ -355,6 +353,11 @@
           }).catch(err => {
             console.log('Error', err);
           });
+        }
+      },
+      showEditTags: function(show) {
+        if(!show) {
+          this.getTagsTypes();
         }
       }
     },
@@ -427,12 +430,18 @@
       },
       parseTags: function(task) {
         if(!this.tagsTypes) {
-          this.getTagsTypes();
+          this.showError('We need tag types to parse tags');
+          return;
         }
+        pp(task);
         return {};
       },
       getTagsTypes: function() {
-        console.log(documentId);
+        store.get(EditTags.documentId).then(res => {
+            this.tagsTypes = res.types;
+        }).catch(err => {
+            console.log('Error', err);
+        });
       },
       edit: function(task, mode, inputId) {
         this.editCancelable = true;
@@ -475,6 +484,7 @@
               self.tasks.push(item.doc);
             }
           });
+          self.debug = JSON.stringify(self.tasks, null, 2);
           //pp(self.tasks);
           //console.log(self.sumPlan, self.sumDone);
         }).catch(err => {
@@ -487,15 +497,15 @@
         if (item.name && item.eUnits) {
           var clon = this.prepClon(item);
           if (item._id) {
-            this.updateTask(clon, item)
+            this.updateTask(clon, item.eUnits)
           } else {
-            this.createTask(clon, item)
+            this.createTask(clon, item.eUnits)
           }
           this.edited = {};
           this.refresh();
           el('name').focus();
         } else {
-          console.log('we need some data');
+          console.error('We need name and units');
         }
       },
       prepClon: function(item) {
@@ -504,9 +514,9 @@
         delete clon.eUnits;
         return clon;
       },
-      createTask: function(clon, item) {
+      createTask: function(clon, units) {
         clon.units = {};
-        clon.units[this.mode] = parseFloat(item.eUnits);
+        clon.units[this.mode] = parseFloat(units);
         clon._id = clon.name + '_' + this.day;
         clon.day = this.day;
         clon.done = this.mode !== plan;
@@ -516,9 +526,8 @@
           self.showError(err.message);
         });
       },
-      updateTask: function(clon, item) {
-        console.log('update');
-        clon.units[this.mode] = parseFloat(item.eUnits);
+      updateTask: function(clon, units) {
+        clon.units[this.mode] = parseFloat(units);
         store.update(clon);
       },
       showError: function(message) {

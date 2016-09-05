@@ -1,10 +1,13 @@
 <template>
   <div>
-    <input v-model="text" type="text" :id="id" :name="name" :placeholder="placeholder" :class="class"
+    <input v-model="name" type="text" :id="id" :name="name" :placeholder="placeholder" :class="class"
         @keyup.down="focus(0)" @keyup="onChange()"/>
       <ul id="ulAutocomplete" v-if="list.length" class="list-unstyled text-left autocomplete" >
         <li class="autocomplete" v-for="(i, item) in list">
-          <input class="autocomplete" id="suggestion_{{i}}"  @keyup.down="focus(i+1)" @keyup.up="focus(i-1)" @keyup.enter="choose(item)" value="{{item.name}}"/></li>
+          <input class="autocomplete" id="suggestion_{{i}}"
+                 @keyup.down="focus(i+1)"
+                 @keyup.up="focus(i-1)"
+                 @keyup.enter="choose(item)" value="{{item.name}}"/></li>
       </ul>
   </div>
 </template>
@@ -18,7 +21,6 @@
       'list',
       'class',
       'text',
-      'tags',
     ],
 
     data: function () {
@@ -44,13 +46,12 @@
     },
     methods: {
       onChange : function() {
-        if(!this.text || this.text.length === 0) {
+        if(!this.name || this.name.length === 0) {
           this.list = [];
         }
       },
       choose: function(item) {
-        this.text = item.name;
-        this.tags = item.tags.join(', ');
+        this.name = item.name;
         this.list = [];
         el(this.id).focus();
       },
@@ -70,6 +71,7 @@
 
 <style>
   ul.autocomplete {
+    z-index: 1000;
     position: absolute;
     box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px 0px;
     border-top: 1px solid rgb(217, 217, 217);
