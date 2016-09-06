@@ -171,6 +171,7 @@
   import EditTags from './EditTags.vue';
   import $ from 'jquery';
   var _ = require('lodash');
+  import TagsParser from '../helpers/TagsParser.js';
   var store = new StoreCollection.Collection('tasks2');
   
 
@@ -233,9 +234,11 @@
         day: '',
         mode: plan,
         today: today(),
-        tagsTypes: null,
+        tagTypes: null,
+        tagsParser: null,
         showDebug: true,
         debug: '{}',
+
       }
     },
     components: {
@@ -429,16 +432,19 @@
         this.mode = this.mode === done ? plan : done;
       },
       parseTags: function(task) {
-        if(!this.tagsTypes) {
+        if(!this.tagTypes) {
           this.showError('We need tag types to parse tags');
           return;
         }
-        pp(task);
-        return {};
+        if(!this.tagsParser) {
+          this.tagsParser = new TagsParser.TagsParser(this.tagTypes);
+        }
+        return this.tagsParser.parse(task.name + ' ' +task.text);
       },
       getTagsTypes: function() {
+        var self = this;
         store.get(EditTags.documentId).then(res => {
-            this.tagsTypes = res.types;
+          self.tagTypes = res.types;
         }).catch(err => {
             console.log('Error', err);
         });
