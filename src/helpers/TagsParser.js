@@ -7,20 +7,31 @@ var TagsParser = (function() {
     if(!tagTypes || typeof tagTypes !== 'object') {
       throw new Error('Invalid argument tag types has to be an object');
     }
-    this.tagTypes = tagTypes;
+    console.log(typeof tagTypes);
+    this.tagTypes = this.prepareTagTypes(tagTypes);
     this.tags = {};
     this.currentWord = '';
     this.currentTag = '';
   }
+  Def.prototype.prepareTagTypes = function(tagTypes) {
+    var types = {};
+    tagTypes.forEach(function(item) {
+      types[item.sign] = item.name;
+    });
+    return types;
+  };
   Def.prototype.getTags = function() {
     return this.tags;
   };
   Def.prototype.appendToTag = function() {
-    if(!(this.currentTag in this.tags)) {
-      this.tags[this.currentTag] = [];
+    if(!this.currentTag || !this.currentWord) {
+      return;
     }
-    this.tags[this.currentTag].push(this.currentWord);
-    console.log(this.tags);
+    var type = this.tagTypes[this.currentTag];
+    if(!(type in this.tags)) {
+      this.tags[type] = {};
+    }
+    this.tags[type][this.currentWord] = true;
     this.currentWord = this.currentTag = '';
   };
   Def.prototype.parse = function(str) {
@@ -29,7 +40,7 @@ var TagsParser = (function() {
     }
     for(var i = 0; i < str.length; i++ ) {
       if(this.currentWord != '') {
-        if(str[i] == ' ') { // end of the word
+        if(str[i].match(/\s/)) { // end of the word
           this.appendToTag();
           continue;
         }
@@ -43,6 +54,7 @@ var TagsParser = (function() {
         }
       }
     }
+    this.appendToTag();
     return this.tags;
   };
   return Def;

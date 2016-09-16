@@ -69,6 +69,9 @@
         newSign : '',
         newName : '',
         edited : false,
+        // I wanted types to be an object with sign: name schema but it did not work as expected
+        // updating this.type[key] = name did not update the object for some reason, looks to me like
+        // bug in vue
         types: [],
         store: null,
         error: '',

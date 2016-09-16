@@ -195,7 +195,7 @@
         today: today(),
         tagTypes: null,
         tagsParser: null,
-        showDebug: true,
+        showDebug: false,
         debug: '{}',
 
       }
