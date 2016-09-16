@@ -55,7 +55,9 @@ var TagsParser = (function() {
       }
     }
     this.appendToTag();
-    return this.tags;
+    var tags = this.tags;
+    this.tags = {};
+    return tags;
   };
   return Def;
 })();
