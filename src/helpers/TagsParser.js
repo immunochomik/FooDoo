@@ -20,6 +20,7 @@ var TagsParser = (function() {
       this.tags[this.currentTag] = [];
     }
     this.tags[this.currentTag].push(this.currentWord);
+    console.log(this.tags);
     this.currentWord = this.currentTag = '';
   };
   Def.prototype.parse = function(str) {

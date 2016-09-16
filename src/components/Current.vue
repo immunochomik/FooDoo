@@ -63,7 +63,7 @@
         </div>
       </div>
       <div class="panel-body row text-right" style="padding-top: 10px;">
-        <form id="editForm" class="form-inline2" autocomplete="off" v-on:submit.prevent>
+        <form id="editForm" class="form-inline2" autocomplete="off" @submit.prevent>
           <div class="form-group">
             <auto id="name" :list="suggestedNames" :name.sync="edited.name" :text.sync="edited.text" class="form-control" placeholder="Task name">
             </auto>
@@ -90,28 +90,9 @@
           </tr>
           </thead>
           <tbody>
-          <tr style="background-color: #FFF1C6;" v-for="task in tasksPlanedNotDone">
-            <td @click="edit(task, 'plan', 'name')">{{task.name}}</td>
-            <td @click="edit(task, 'plan', 'units')">{{task.units.plan}}</td>
-            <td class="text-right">
-              <button class="btn btn-info btn-xs" @click="copyToNextDay(task)"><span class="glyphicon glyphicon-menu-right"></span></button>
-              <button class="btn btn-info btn-xs" @click="taskDone(task)">
-                <span class="glyphicon glyphicon-menu-down"></span>
-              </button>
-              <button class="btn btn-danger  btn-xs" @click="remove(task)"><span class="glyphicon glyphicon-remove"></span></button>
-            </td>
-          </tr>
-          <tr v-for="task in tasksPlanedDone">
-            <td @click="edit(task, 'plan', 'name')">{{task.name}}</td>
-            <td @click="edit(task, 'plan', 'units')">{{task.units.plan}}</td>
-            <td class="text-right">
-              <button class="btn btn-info btn-xs" @click="copyToNextDay(task)"><span class="glyphicon glyphicon-menu-right"></span></button>
-              <button class="btn btn-info btn-xs" @click="taskDone(task)">
-                <span class="glyphicon glyphicon-menu-down"></span>
-              </button>
-              <button class="btn btn-danger  btn-xs" @click="remove(task)"><span class="glyphicon glyphicon-remove"></span></button>
-            </td>
-          </tr>
+            <tr is="taskrow" v-for="task in tasksPlanedNotDone" :task="task"
+                style="background-color: #FFF1C6;" mode="plan"></tr>
+            <tr is="taskrow" v-for="task in tasksPlanedDone" :task="task" mode="plan"></tr>
           </tbody>
         </table>
       </div>
@@ -125,32 +106,9 @@
           </tr>
           </thead>
           <tbody>
-          <tr v-for="task in tasksPlanedDone">
-            <td @click="edit(task, 'done', 'name')">{{task.name}}</td>
-            <td @click="edit(task, 'done', 'units')">{{task.units.done}}</td>
-            <td class="text-right">
-              <button class="btn btn-info btn-xs" @click="copyToNextDay(task)"><span class="glyphicon glyphicon-menu-right"></span></button>
-              <button class="btn btn-info btn-xs" @click="moveToPlan(task)">
-                <span class="glyphicon glyphicon-menu-up"></span>
-              </button>
-              <button class="btn btn-danger  btn-xs" @click="remove(task)"><span class="glyphicon glyphicon-remove"></span></button>
-            </td>
-          </tr>
-          <tr style="background-color: lightgrey;" v-for="task in tasksDoneNotPlanned">
-            <td @click="edit(task, 'done', 'name')">{{task.name}}</td>
-            <td @click="edit(task, 'done', 'units')">{{task.units.done}}</td>
-            <td class="text-right">
-              <button class="btn btn-info btn-xs" @click="copyToNextDay(task)">
-                <span class="glyphicon glyphicon-menu-right"></span>
-              </button>
-              <button class="btn btn-info btn-xs" @click="moveToPlan(task)">
-                <span class="glyphicon glyphicon-menu-up"></span>
-              </button>
-              <button class="btn btn-danger btn-xs" @click="remove(task)">
-                <span class="glyphicon glyphicon-remove"></span>
-              </button>
-            </td>
-          </tr>
+          <tr is="taskrow" v-for="task in tasksPlanedDone" :task="task" mode="done"></tr>
+          <tr is="taskrow" v-for="task in tasksDoneNotPlanned" :task="task" mode="done"
+              style="background-color: lightgrey;"></tr>
           </tbody>
         </table>
       </div>
@@ -169,11 +127,12 @@
   import DayPicker from './DayPicker.vue';
   import Auto from './Autocomplete.vue';
   import EditTags from './EditTags.vue';
+  import TaskRow from './TaskRow.vue';
   import $ from 'jquery';
   var _ = require('lodash');
   import TagsParser from '../helpers/TagsParser.js';
   var store = new StoreCollection.Collection('tasks2');
-  
+
 
   var getScreenSize = function() {
     return screen.width / $('#cm').width();
@@ -245,6 +204,7 @@
       'day-picker': DayPicker,
       'auto': Auto,
       'edit-tags': EditTags,
+      'taskrow' : TaskRow
     },
     route: {
       data: function(to) {
