@@ -1,5 +1,7 @@
 <style>
-
+  html {
+    overflow-y: scroll;
+  }
   div.form-group {
     margin-top: 0.5em;
   }
@@ -42,7 +44,6 @@
 </style>
 
 <template>
-
   <div id="mainDiv" class="container-fluid">
     <edit-tags :show.sync="showEditTags"></edit-tags>
     <div v-show="error" id="error" class="alert alert-danger form-group">
@@ -132,45 +133,26 @@
   var _ = require('lodash');
   import TagsParser from '../helpers/TagsParser.js';
   var store = new StoreCollection.Collection('tasks2');
+  import FlatFormResizer from '../helpers/FlatFormResizer.js';
 
-
-  var getScreenSize = function() {
-    return screen.width / $('#cm').width();
-  };
-  var resizeTaskName = function() {
-    var widthCm = getScreenSize();
-    if (document.getElementById('name')) {
+  var ffr = new FlatFormResizer.FlatFormResizer({
+    mainInputId : 'name',
+    mainInputOffset: 139,
+    itemsSizes : {
+      units: '60px',
+      parseButtonDiv: '40px',
+      parseButton: '40px'
+    },
+    afterResize : function() {
       var ulAutocomp = document.getElementById('ulAutocomplete');
       if (ulAutocomp) {
         ulAutocomp.style.width = document.getElementById('name').clientWidth + 'px';
       }
-      var width = {
-        name: (window.innerWidth - 160) + 'px',
-        units: '60px',
-        parseButtonDiv: '40px',
-        parseButton: '40px'
-      };
-      if (window.innerWidth < 528) {
-        for (var id in width) {
-          try {
-            document.getElementById(id).style.width = '100%';
-            document.getElementById(id).style.dispaly = 'block';
-          } catch (err) {
-            console.log(id, err.message);
-          }
-        }
-      } else {
-        for (var id in width) {
-          try {
-            document.getElementById(id).style.width = width[id];
-          } catch (err) {
-            console.log(id, err.message);
-          }
-        }
-      }
     }
+  });
+  var resizeTaskName = function() {
+    ffr.resize();
   };
-
 
   var plan = 'plan',
       done = 'done';

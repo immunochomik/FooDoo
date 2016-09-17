@@ -1,7 +1,4 @@
 <style>
-
-
-
 </style>
 
 <template>
@@ -66,40 +63,30 @@
       </table>
     </div>
   </div>
-
 </template>
 
 <script>
-
   import StoreCollection from '../storeCollection';
-
   var todo = new StoreCollection.Collection('backBurner');
   var planedStore = new StoreCollection.Collection('tasks2');
   var _ = require('lodash');
   import $ from 'jquery';
   var moment = require('moment');
+  import FlatFormResizer from '../helpers/FlatFormResizer.js';
 
-  var resizeForm = function() {
-    if (document.getElementById('name')) {
-      var width = {
-        name: (window.innerWidth - 367) + 'px',
-        tags: '160px',
-        units: '60px',
-        priority: '60px',
-        parseButtonDivToDo: '40px',
-        parseButtonToDo: '40px'
-      };
-      if (window.innerWidth < 528) {
-        for (var id in width) {
-          document.getElementById(id).style.width = '100%';
-          document.getElementById(id).style.dispaly = 'block';
-        }
-      } else {
-        for (var id in width) {
-          document.getElementById(id).style.width = width[id];
-        }
-      }
+  var ffr = new FlatFormResizer.FlatFormResizer({
+    mainInputId : 'name',
+    mainInputOffset: 367,
+    itemsSizes : {
+      tags: '160px',
+      units: '60px',
+      priority: '60px',
+      parseButtonDivToDo: '40px',
+      parseButtonToDo: '40px'
     }
+  });
+  var resizeForm = function() {
+    ffr.resize();
   };
 
   var maxInDay = 8;
