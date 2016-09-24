@@ -5,6 +5,7 @@ these notes should have categories so summaries of categories can be presented, 
 
 It is in browser app without any backend, well I will need to add some backend when FooDoo will be used for tracking team efforts.
 
+The app can be accessed at http://fodo.s3-website-eu-west-1.amazonaws.com/
 
 > A Vue.js project
 
