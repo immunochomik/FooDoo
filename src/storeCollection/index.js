@@ -2,6 +2,13 @@ var PouchDB = require('pouchdb');
 PouchDB.plugin(require('pouchdb-quick-search/lib'));
 var _ = require('lodash');
 
+function myDeltaFunction(doc) {
+  doc.counter = doc.counter || 0;
+  doc.counter++;
+  return doc;
+}
+
+
 var Collection = (function() {
   function Collection(name) {
     this.db = new PouchDB(name);
@@ -41,6 +48,13 @@ var Collection = (function() {
   Collection.prototype.allDocs = function(options) {
     return this.db.allDocs(options);
   };
+  Collection.prototype.compact = function () {
+    this.db.compact().then(res => {
+        console.log(res);
+    }).catch(err => {
+        console.log('Error', err);
+    });
+  };
   Collection.prototype.all = function() {
     return this.db.allDocs({
       include_docs:true
@@ -68,8 +82,9 @@ var Collection = (function() {
   };
 
   Collection.prototype.removeById = function(id) {
-    db.get(id).then(doc => {
-      return db.remove(doc);
+    var self = this;
+    this.db.get(id).then(doc => {
+      return self.db.remove(doc);
     }).catch(err => {
       console.log('Error', err);
     });
@@ -96,6 +111,13 @@ var Collection = (function() {
               console.log('Error', err);
           }
       });
+  };
+  Collection.prototype.destroy = function() {
+    this.db.destroy().then(res => {
+        console.log(res);
+    }).catch(err => {
+        console.log('Error', err);
+    });
   }
   return Collection;
 })();
