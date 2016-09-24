@@ -179,7 +179,6 @@
         tagsParser: null,
         showDebug: false,
         debug: '{}',
-
       }
     },
     components: {

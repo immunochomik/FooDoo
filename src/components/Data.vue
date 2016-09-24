@@ -14,9 +14,9 @@
         <textarea v-model="query" class="form-control" placeholder="were"> </textarea>
         <div style="margin-top: 1em;" class="text-center">
           <button class="btn btn-default quoter" @click="find">Find</button>
-          <button class="btn btn-default quoter">Insert</button>
+          <button class="btn btn-default quoter" @click="insert">Insert</button>
           <button class="btn btn-default quoter">Update</button>
-          <button class="btn btn-danger quoter">Delete</button>
+          <button class="btn btn-danger quoter" @click="delete">Delete</button>
         </div>
       </div>
       <div class="panel-body col-sm-6">
@@ -73,6 +73,28 @@
       find: function() {
         this.refresh();
       },
+      insert : function() {
+        if(this.update) {
+          var doc = JSON.parse(this.update);
+          if(!doc) {
+            return;
+          }
+          store.put(doc);
+        }
+      },
+      delete : function() {
+        if(this.query) {
+          var doc = JSON.parse(this.query);
+          if(!doc || !doc.id) {
+            return;
+          }
+          store.remove(doc).then(res => {
+            this.refresh();
+          }).catch(err => {
+            console.log('Error', err);
+          });
+        }
+      },
       filterFind : function(docs) {
         var query = JSON.parse(this.query);
         if(query) {
@@ -89,7 +111,6 @@
         return docs;
       },
       refresh : function() {
-
         store.all().then(res => {
           this.fullData = JSON.stringify(this.filterFind(res.rows), null, 2);
         }).catch(err => {
