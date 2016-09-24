@@ -15,7 +15,7 @@
         <div style="margin-top: 1em;" class="text-center">
           <button class="btn btn-default quoter" @click="find">Find</button>
           <button class="btn btn-default quoter" @click="insert">Insert</button>
-          <button class="btn btn-default quoter">Update</button>
+          <button class="btn btn-default quoter" @click="updateDoc">Update</button>
           <button class="btn btn-danger quoter" @click="deleteItems">Delete</button>
         </div>
       </div>
@@ -93,6 +93,16 @@
     methods : {
       compact : function() {
         store.compact();
+      },
+      updateDoc : function () {
+        if(this.update) {
+          var doc = JSON.parse(this.update);
+          if(!doc) {
+            console.error('We need dock to update');
+            return;
+          }
+          store.update(doc);
+        }
       },
       deleteItems : function() {
         store.all().then(res => {
