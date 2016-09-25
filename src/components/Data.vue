@@ -40,6 +40,17 @@
       </div>
 
     </div>
+    <div class="row">
+      <hr>
+      <div class="col-sm-10"  style="padding: 0 2em">
+      <textarea v-model="applyToData" class="form-control" rows="20"
+                placeholder="Function to apply to data"></textarea>
+      </div>
+      <div class="col-sm-2">
+        <button class="btn btn-danger" style="width: 100%" @click="applyFunction">Apply</button>
+      </div>
+    </div>
+    <hr>
   </div>
 </template>
 <script>
@@ -82,6 +93,7 @@
         fullData : {},
         update: '{}',
         query: '{}',
+        applyToData : '',
       }
     },
     route: {
@@ -91,6 +103,42 @@
       }
     },
     methods : {
+      validateApplyFunction : function() {
+        if(!this.applyToData) {
+          console.error('We need apply to data model to be set');
+          return;
+        }
+        var func = Function('doc', this.applyToData);
+        var test = {test:1};
+        try {
+          test = func(test);
+        } catch (e) {
+          console.error('Error while testing transformation function', e);
+          return;
+        }
+        if(!test) {
+          throw new Error('Transformation function hast to return value');
+        }
+        return func;
+      },
+      applyFunction: function() {
+        var func = this.validateApplyFunction();
+        if(!func) {
+          return;
+        }
+        this.fullData.forEach(function(item) {
+          try {
+            item.doc = func(item.doc);
+            store.update(item.doc).then(res => {
+              console.log(res);
+            }).catch(err => {
+              console.log('Error', err);
+            });
+          } catch(err) {
+            console.error(err);
+          }
+        });
+      },
       compact : function() {
         store.compact();
       },
@@ -218,6 +266,42 @@
       }
     }
 
+  }
+
+  function tr(doc) {
+    var pr= 'project';
+    var ty = 'type';
+    var te = 'technology';
+    var known = {
+      elmin : pr,
+      api : pr,
+      dm : pr,
+      logs : pr,
+      pc : pr,
+      bug : ty,
+      request : ty,
+      feature : ty,
+      jira : ty,
+      fire : ty,
+      opps : ty,
+      maintenance : ty,
+      edu : ty,
+      es : te,
+    };
+    var tags = {};
+    if(Array.isArray(doc.tags) ) {
+      doc.tags.forEach(function(tag) {
+        if(known[tag]) {
+          if(!tags[known[tag]]) {
+            tags[known[tag]] = {}
+          }
+          tags[known[tag]][tag] = true;
+        }
+      });
+      doc.tagsOld = doc.tags;
+      doc.tags = tags;
+    }
+    return doc;
   }
 </script>
 
