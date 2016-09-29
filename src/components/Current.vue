@@ -475,11 +475,7 @@
       },
       updateTask: function(clon, units) {
         clon.units[this.mode] = parseFloat(units);
-        store.upsert(clon).then(res => {
-          console.log(res);        
-        }).catch(err => {
-            console.log('Error', err);
-        });
+        store.update(clon);
       },
       showError: function(message) {
         this.error = message;
