@@ -10,6 +10,9 @@ String.prototype.format = String.prototype.f =  function() {
     return (typeof args[key] !== "undefined" ? args[key] : match);
   });
 };
+String.prototype.capitalizeFirstLetter = function() {
+  return this.charAt(0).toUpperCase() + this.slice(1);
+};
 
 function printIt(x) {
   var cache = [];

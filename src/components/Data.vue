@@ -42,12 +42,16 @@
     </div>
     <div class="row">
       <hr>
-      <div class="col-sm-10"  style="padding: 0 2em">
+      <div class="col-sm-9"  style="padding: 0 2em">
       <textarea v-model="applyToData" class="form-control" rows="20"
                 placeholder="Function to apply to data"></textarea>
       </div>
-      <div class="col-sm-2">
-        <button class="btn btn-danger" style="width: 100%" @click="applyFunction">Apply</button>
+      <div class="col-sm-3">
+        <button class="btn btn-danger" style="width: 100%"
+                @click="applyMapper">Map</button>
+        <button class="btn btn-danger" style="width: 100%; margin-top:5px;"
+                @click="applyReducer">Reduce</button>
+        <pre v-if="aggregate" style="margin-top: 5px;">{{ displayAggregate }}</pre>
       </div>
     </div>
     <hr>
@@ -94,6 +98,7 @@
         update: '{}',
         query: '{}',
         applyToData : '',
+        aggregate: null
       }
     },
     route: {
@@ -103,26 +108,62 @@
       }
     },
     methods : {
-      validateApplyFunction : function() {
-        if(!this.applyToData) {
+        validateMapper : function(code) {
+          if(!code) {
+            console.error('We need apply to data model to be set');
+            return;
+          }
+          var func = Function('doc', code);
+          var test = {test:1};
+          try {
+            test = func(test);
+          } catch (e) {
+            console.error('Error while testing transformation function', e);
+            return;
+          }
+          if(!test) {
+            console.error('Transformation function hast to return value');
+            return;
+          }
+          return func;
+      },
+      validateReducer: function(code) {
+        if(!code) {
           console.error('We need apply to data model to be set');
           return;
         }
-        var func = Function('doc', this.applyToData);
+        var func = new Function('doc', 'reduce', code);
+        var aggregation = {};
         var test = {test:1};
         try {
-          test = func(test);
+          aggregation = func(test, aggregation);
         } catch (e) {
           console.error('Error while testing transformation function', e);
           return;
         }
-        if(!test) {
-          throw new Error('Transformation function hast to return value');
+        if(!aggregation) {
+          console.error('Function hast to return value');
+          return;
         }
         return func;
       },
-      applyFunction: function() {
-        var func = this.validateApplyFunction();
+      applyReducer : function() {
+        var func = this.validateReducer(this.applyToData);
+        if(!func) {
+          return;
+        }
+        this.aggregate = {};
+        var self = this;
+        try {
+          this.fullData.forEach(function(item) {
+            self.aggregate = func(item.doc, self.aggregate);
+          });
+        } catch(err) {
+          console.error(err);
+        }
+      },
+      applyMapper: function() {
+        var func = this.validateMapper(this.applyToData);
         if(!func) {
           return;
         }
@@ -263,15 +304,27 @@
     computed : {
       fullDataString: function() {
         return JSON.stringify(this.fullData, null, 2);
+      },
+      displayAggregate : function() {
+        return JSON.stringify(this.aggregate, null, 2);
       }
     }
 
+  }
+  function getTags(doc, reduce) {
+    if(_.isArray(doc.tags)) {
+      doc.tags.forEach(function(tag) {
+        reduce[tag] = true;
+      });
+    }
+    return reduce;
   }
 
   function tr(doc) {
     var pr= 'project';
     var ty = 'type';
     var te = 'technology';
+    var pe = 'person';
     var known = {
       elmin : pr,
       api : pr,
@@ -280,20 +333,79 @@
       pc : pr,
       bug : ty,
       request : ty,
+      research : ty,
+      refund : ty,
+      redo : ty,
       feature : ty,
+      tests: ty,
       jira : ty,
       fire : ty,
       opps : ty,
+      office :ty,
+      review : ty,
       maintenance : ty,
+      wiki : ty,
       edu : ty,
       es : te,
+      skerkby : pe,
+      committing : ty,
+      code_management : ty,
+      tools : ty,
+      cs: pe,
+      snapshots : pr,
+      automation : ty,
+      people : ty,
+      meeting : ty,
+      kibana : te,
+      impuls : ty,
+      profiling : ty,
+      hols: ty,
+      change: ty,
+      usability : ty,
+      nojira : ty,
     };
     var tags = {};
+    var itIsTheSame = function(tag) {
+      var same = {
+        emlin : 'elmin',
+        rewrite : 'redo',
+        test: 'tests',
+        testing : 'tests',
+        ops : 'opps',
+        investigation: 'research',
+        figure: 'research',
+        elite : 'api',
+        'sharing-knowledge' : 'people',
+        mistake : 'bug',
+        emails : 'people',
+        email : 'people',
+        telemetry : 'logs',
+        meting : 'meeting',
+        reuest : 'request',
+        data : 'logs',
+        bugs : 'bug',
+        'api-bug' : 'bug',
+        requests : 'request',
+        'elite-api' : 'api',
+        'engineers' : 'api',
+        log : 'logs',
+        'clean-code' : 'redo',
+        tool : 'tools',
+        jire : 'jira',
+        sharing : 'people',
+        sick : 'hols',
+        info : 'people',
+        phpStorm : 'tools'
+      };
+      return same[tag] || tag;
+    };
     if(Array.isArray(doc.tags) ) {
       doc.tags.forEach(function(tag) {
+        tag = itIsTheSame(tag.toLocaleString().trim());
+        console.log(tag);
         if(known[tag]) {
           if(!tags[known[tag]]) {
-            tags[known[tag]] = {}
+            tags[known[tag]] = {};
           }
           tags[known[tag]][tag] = true;
         }

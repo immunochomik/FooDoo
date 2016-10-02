@@ -40,22 +40,25 @@
       </div>
       <div class="col-sm-6">
         <p>Categories</p>
-        <table @mouseleave="tagMouseLeave" class="table table-hover table-striped table-condensed">
+        <div v-for="category in tagCategories">
+          <table  @mouseleave="tagMouseLeave"
+               class="table table-hover table-striped table-condensed">
           <thead>
           <tr>
-            <th @click="taskByCatSort('name')" style="width: 75%">Tag</th>
-            <th @click="taskByCatSort('plan')" class="text-right" >Units<br>Planed</th>
-            <th @click="taskByCatSort('done')" class="text-right" >Units<br>Done</th>
+            <th style="width: 75%">Tag in {{ category.capitalizeFirstLetter() }}</th>
+            <th class="text-right" >Units<br>Planed</th>
+            <th class="text-right" >Units<br>Done</th>
           </tr>
           </thead>
           <tbody>
-          <tr v-for="row in byTagList" >
+          <tr v-for="row in byTagAggregationLists[category]" >
             <td @mouseover=tagRowHover(row.name) >{{row.name}}</td>
             <td class="text-right">{{row.plan}}</td>
             <td class="text-right">{{row.done}}</td>
           </tr>
           </tbody>
         </table>
+        </div>
       </div>
     </div>
     </div>
@@ -104,7 +107,8 @@
         byNameList: [],
         byName: {},
         byTag: {},
-        byTagList: [],
+        byTagAggregationLists : {},
+        tagCategories: [],
         byDay: {},
         sumPlan: 0,
         sumDone: 0,
@@ -121,8 +125,8 @@
       }
     },
     methods: {
-      makeTagClasses : function(obj) {
-        return Object.keys(obj).join(' ');
+      makeTagClasses : function(list) {
+        return list.join(' ');
       },
       tagRowHover: function(tag) {
         $('.task-name').css('background-color', '');
@@ -153,6 +157,8 @@
       resetAll: function() {
         this.byName = {};
         this.byTag = {};
+        this.tagCategories = [];
+        this.byTagAggregationLists = {},
         this.byDay = {};
         this.tasks = [];
         this.sumPlan = this.sumDone = this.sumUnplanned = 0;
@@ -173,12 +179,18 @@
             self.aggregateName(item.doc);
             self.aggregateTags(item.doc);
           });
-          self.byTagList = Object.values(self.byTag).sort(sortByDone);
           self.byNameList = Object.values(self.byName).sort(sortByDone);
           self.prepareUnplannedWork();
+          self.prepareByTagsList();
         }).catch(err => {
-          console.log(err)
+          console.error(err)
         });
+      },
+      prepareByTagsList: function() {
+        this.tagCategories = Object.keys(this.byTag).sort(function(a,b) {return a<b;});
+        for(var category in this.byTag ) {
+          this.byTagAggregationLists[category] = Object.values(this.byTag[category]).sort(sortByDone);
+        }
       },
       prepareUnplannedWork : function() {
         var proportion = this.sumUnplanned / this.sumDone;
@@ -186,7 +198,6 @@
         var length = window.innerWidth - 10;
         var unpLength =  Math.ceil(length * proportion);
         var planLength = length - unpLength;
-        console.log(length, unpLength, planLength);
         setTimeout(function() {
           d3.select('#plannedRect').attr('width', planLength);
           var unplannedRect = d3.select('#unplannedRect');
@@ -197,12 +208,14 @@
 
       },
       aggregateName: function(item) {
-        var tagsClass = function(list) {
-          var tags = {};
-          _.each(_.map(list, function(it) {return 'tag-'+it}), function(it){
-            tags[it] = true;
-          });
-          return tags;
+        var tagsClass = function(tags) {
+          var classes = [];
+          for(var category in tags) {
+            for(var tag in tags[category]) {
+              classes.push('tag-'+tag);
+            }
+          }
+          return classes;
         };
         if (!this.byName[item.name]) {
           this.byName[item.name] = {
@@ -220,23 +233,29 @@
         this.sumDone += item.units.done || 0;
         if(item.units.done > (item.units.plan || 0)) {
           this.sumUnplanned += (item.units.done - (item.units.plan || 0));
-          console.log('unplande item add', item.name);
         }
       },
       aggregateTags: function(item) {
         var self = this;
-        _.each(item.tags, function(tag) {
-          if (!self.byTag[tag]) {
-            self.byTag[tag] = {
-              name: tag,
-              plan: item.units.plan || 0,
-              done: item.units.done || 0
-            }
-          } else {
-            self.byTag[tag].plan += item.units.plan || 0;
-            self.byTag[tag].done += item.units.done || 0;
+        // for each tag category 
+        for(var category in item.tags) {
+          if(!self.byTag[category]) {
+            self.byTag[category] = {}
           }
-        });
+          // for each tag in category
+          for(var tag in item.tags[category]) {
+            if(!self.byTag[category][tag]) {
+              self.byTag[category][tag] = {
+                name: tag,
+                plan: item.units.plan || 0,
+                done: item.units.done || 0
+              }
+            } else {
+              self.byTag[category][tag].plan += item.units.plan || 0;
+              self.byTag[category][tag].done += item.units.done || 0;
+            }
+          }
+        }
       },
       doneSumary: function() {
         this.doneByName = [];
